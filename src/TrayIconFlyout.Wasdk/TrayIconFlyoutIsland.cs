@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using System;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	public partial class TrayIconFlyoutIsland : ContentControl
 	{

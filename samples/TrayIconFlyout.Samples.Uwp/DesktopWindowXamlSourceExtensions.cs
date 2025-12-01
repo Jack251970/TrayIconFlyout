@@ -4,7 +4,7 @@
 using Windows.UI.Xaml.Hosting;
 using Windows.Win32;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	public unsafe static class DesktopWindowXamlSourceExtensions
 	{

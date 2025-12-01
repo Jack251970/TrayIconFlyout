@@ -14,7 +14,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	internal unsafe partial class XamlIslandHostWindow : IDisposable
 	{

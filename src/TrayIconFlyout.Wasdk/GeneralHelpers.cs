@@ -3,7 +3,7 @@
 
 using Microsoft.Win32;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	internal static class GeneralHelpers
 	{

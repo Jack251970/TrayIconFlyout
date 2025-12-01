@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	internal partial class RootViewModel : ObservableObject
 	{

@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	public partial class ContentBackdropManager : IDisposable
 	{

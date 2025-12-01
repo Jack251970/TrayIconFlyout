@@ -10,7 +10,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Threading.Tasks;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	[ContentProperty(Name = nameof(Islands))]
 	public partial class TrayIconFlyout : Control, IDisposable

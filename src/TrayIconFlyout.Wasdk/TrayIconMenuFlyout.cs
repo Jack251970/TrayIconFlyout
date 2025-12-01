@@ -10,7 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
     [ContentProperty(Name = nameof(Items))]
     public partial class TrayIconMenuFlyout : ItemsControl

@@ -3,7 +3,7 @@
 
 using Microsoft.UI.Xaml.Controls;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	public sealed partial class MainTrayIconMeunFlyout : TrayIconMenuFlyout
 	{

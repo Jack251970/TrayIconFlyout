@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	public sealed partial class MainPage : Page
 	{

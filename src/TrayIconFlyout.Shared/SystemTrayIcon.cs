@@ -12,7 +12,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
     public unsafe class SystemTrayIcon
     {

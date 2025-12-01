@@ -11,7 +11,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media.Animation;
 #endif
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	internal static class TransitionHelpers
 	{

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace U5BFA.TrayIconFlyout
+namespace U5BFA.Libraries
 {
 	internal class Program
 	{
