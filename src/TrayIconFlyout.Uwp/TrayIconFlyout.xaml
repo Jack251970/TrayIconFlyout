@@ -5,28 +5,6 @@
 	xmlns:local="using:U5BFA.Libraries"
 	xmlns:systembackdrops="using:Microsoft.UI.Composition.SystemBackdrops">
 
-	<ResourceDictionary.ThemeDictionaries>
-		<ResourceDictionary x:Key="Light">
-			<AcrylicBrush
-				x:Key="FlyoutAcrylicBrush"
-				FallbackColor="#FFEEEEEE"
-				TintColor="#FFF3F3F3"
-				TintLuminosityOpacity="0.9"
-				TintOpacity="0" />
-		</ResourceDictionary>
-		<ResourceDictionary x:Key="Dark">
-			<AcrylicBrush
-				x:Key="FlyoutAcrylicBrush"
-				FallbackColor="#FF1C1C1C"
-				TintColor="#FF202020"
-				TintLuminosityOpacity="0.96"
-				TintOpacity="0.5" />
-		</ResourceDictionary>
-		<ResourceDictionary x:Key="HighContrast">
-			<SolidColorBrush x:Key="FlyoutAcrylicBrush" Color="{ThemeResource SystemColorWindowColor}" />
-		</ResourceDictionary>
-	</ResourceDictionary.ThemeDictionaries>
-
 	<Style BasedOn="{StaticResource DefaultWindows11TrayIconFlyoutStyle}" TargetType="local:TrayIconFlyout" />
 	<Style BasedOn="{StaticResource DefaultTrayIconFlyoutIslandStyle}" TargetType="local:TrayIconFlyoutIsland" />
 

@@ -3,11 +3,20 @@
 
 using System;
 using System.Drawing;
+
+#if UWP
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
+#elif WASDK
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Markup;
+using Microsoft.UI.Xaml.Media;
+#endif
 
 namespace U5BFA.Libraries
 {
@@ -57,7 +66,7 @@ namespace U5BFA.Libraries
 				_menuFlyout.Items.Add((MenuFlyoutItemBase)item);
 		}
 
-		public unsafe void Show(Point point)
+		public void Show(Point point)
 		{
 			if (_menuFlyout is null)
 				return;
@@ -84,14 +93,7 @@ namespace U5BFA.Libraries
 
 		private void UpdateFlyoutTheme()
 		{
-			if (GeneralHelpers.IsTaskbarLight())
-			{
-				RequestedTheme = ElementTheme.Light;
-			}
-			else
-			{
-				RequestedTheme = ElementTheme.Dark;
-			}
+			RequestedTheme = GeneralHelpers.IsTaskbarLight() ? ElementTheme.Light : ElementTheme.Dark;
 		}
 	}
 }

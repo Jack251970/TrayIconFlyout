@@ -6,28 +6,35 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Windows.Foundation;
 using Windows.Graphics;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Hosting;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
-using Windows.Win32.System.Com;
-using Windows.Win32.System.WinRT;
 using Windows.Win32.System.WinRT.Xaml;
 using Windows.Win32.UI.WindowsAndMessaging;
+using Windows.Win32.System.WinRT;
+using Windows.Win32.System.Com;
 using WinRT;
-using static Windows.Win32.ManualDefinitions;
+
+#if UWP
+using Windows.UI.Core;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Hosting;
+#elif WASDK
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Hosting;
+#endif
 
 namespace U5BFA.Libraries
 {
-	public unsafe class XamlIslandHostWindow : IDisposable
+	internal unsafe partial class XamlIslandHostWindow : IDisposable
 	{
 		private const string WindowClassName = "TrayIconFlyoutHostClass";
 		private const string WindowName = "TrayIconFlyoutHostWindow";
 
 		private readonly WNDPROC _wndProc;
 
+#if UWP
 		private HWND _hwnd = default;
 		private HWND _xamlHwnd = default;
 		private HWND _coreHwnd = default;
@@ -36,6 +43,7 @@ namespace U5BFA.Libraries
 		private CoreWindow? _coreWindow = null;
 
 		private ComPtr<IDesktopWindowXamlSourceNative2> _pDesktopWindowXamlSourceNative2 = default;
+#endif
 
 		internal HWND HWnd
 		{
@@ -94,6 +102,7 @@ namespace U5BFA.Libraries
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
 				WINDOW_STYLE.WS_POPUP, 0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
 
+#if UWP
 			InitializeDesktopWindowXamlSource();
 
 			MSG msg;
@@ -106,39 +115,106 @@ namespace U5BFA.Libraries
 					PInvoke.DispatchMessage(&msg);
 				}
 			}
+#else
+			DesktopWindowXamlSource = new();
+			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
+			DesktopWindowXamlSource.Content = content;
+#endif
 		}
 
-		public void InitializeDesktopWindowXamlSource()
+		internal void MoveAndResize(RectInt32 rect)
 		{
-			// Is this needed anymore? maybe for older builds?
-			fixed (char* pwszTwinApiAppCoreDll = "twinapi.appcore.dll", pwszThreadPoolWinRTDll = "threadpoolwinrt.dll")
-			{
-				PInvoke.LoadLibrary(pwszTwinApiAppCoreDll);
-				PInvoke.LoadLibrary(pwszThreadPoolWinRTDll);
-			}
+			if (DesktopWindowXamlSource is null)
+				return;
+
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, 0U);
+
+			PInvoke.SetWindowPos(
+#if UWP
+				_xamlHwnd,
+#else
+				(HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value,
+#endif
+				HWND.HWND_TOP, 0, 0, rect.Width, rect.Height, 0U);
+		}
+
+		internal void Maximize()
+		{
+			if (DesktopWindowXamlSource is null)
+				return;
+
+			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+
+			PInvoke.SetWindowPos(
+#if UWP
+				_xamlHwnd,
+#else
+				(HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value,
+#endif
+				HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+		}
+
+		internal void SetHWndRectRegion(RectInt32 rect)
+		{
+			if (DesktopWindowXamlSource is null)
+				return;
+
+			HRGN region = PInvoke.CreateRectRgn(rect.X, rect.Y, rect.Width, rect.Height);
+			PInvoke.SetWindowRgn(HWnd, region, false);
+
+			PInvoke.SetWindowRgn(
+#if UWP
+				_xamlHwnd,
+#else
+				(HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value,
+#endif
+				region, false);
+		}
+
+		internal void UpdateWindowVisibility(bool isVisible)
+		{
+			PInvoke.ShowWindow(HWnd, isVisible ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_HIDE);
+
+#if UWP
+			PInvoke.ShowWindow(_xamlHwnd, isVisible ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_HIDE);
+#else
+			if (isVisible) DesktopWindowXamlSource?.SiteBridge.Show(); else DesktopWindowXamlSource?.SiteBridge.Hide();
+#endif
+		}
+
+#if UWP
+		private void InitializeDesktopWindowXamlSource()
+		{
+			// NOTE: Is this needed anymore? maybe for older builds?
+			PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "twinapi.appcore.dll".GetPinnableReference())));
+			PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "threadpoolwinrt.dll".GetPinnableReference())));
 
 			_xamlManager = WindowsXamlManager.InitializeForCurrentThread();
 			DesktopWindowXamlSource = new();
 
-			Guid IID_IDesktopWindowXamlSourceNative2 = IDesktopWindowXamlSourceNative2.IID_Guid;
-			Guid IID_ICoreWindowInterop = ICoreWindowInterop.IID_Guid;
-
-			((IUnknown*)((IWinRTObject)DesktopWindowXamlSource).NativeObject.ThisPtr)->QueryInterface(&IID_IDesktopWindowXamlSourceNative2, (void**)_pDesktopWindowXamlSourceNative2.GetAddressOf());
+			// QI for IDesktopWindowXamlSourceNative2
+			((IUnknown*)((IWinRTObject)DesktopWindowXamlSource).NativeObject.ThisPtr)->QueryInterface(
+				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_IDesktopWindowXamlSourceNative2)), (void**)_pDesktopWindowXamlSourceNative2.GetAddressOf());
 
 			// For extra safety
 			GC.KeepAlive(DesktopWindowXamlSource);
 
+			// Set the base HWND
 			_pDesktopWindowXamlSourceNative2.Get()->AttachToWindow(_hwnd);
+
+			// Get the XAML island HWND
 			_pDesktopWindowXamlSourceNative2.Get()->get_WindowHandle((HWND*)Unsafe.AsPointer(ref _xamlHwnd));
 
 			RECT wRect;
 			PInvoke.GetClientRect(_hwnd, &wRect);
 			PInvoke.SetWindowPos(_xamlHwnd, HWND.Null, 0, 0, wRect.right - wRect.left, wRect.bottom - wRect.top, SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER);
 
+			// Get CoreWindow and its HWND
 			_coreWindow = CoreWindow.GetForCurrentThread();
-
 			using ComPtr<ICoreWindowInterop> pCoreWindowInterop = default;
-			((IUnknown*)((IWinRTObject)_coreWindow).NativeObject.ThisPtr)->QueryInterface(&IID_ICoreWindowInterop, (void**)pCoreWindowInterop.GetAddressOf());
+			((IUnknown*)((IWinRTObject)_coreWindow).NativeObject.ThisPtr)->QueryInterface(
+				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_ICoreWindowInterop)), (void**)pCoreWindowInterop.GetAddressOf());
 			pCoreWindowInterop.Get()->get_WindowHandle((HWND*)Unsafe.AsPointer(ref _coreHwnd));
 
 			_xamlInitialized = true;
@@ -153,47 +229,13 @@ namespace U5BFA.Libraries
 
 			return result;
 		}
-
-		internal void MoveAndResize(RectInt32 rect)
-		{
-			if (DesktopWindowXamlSource is null)
-				return;
-
-			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, 0U);
-			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, rect.Width, rect.Height, 0U);
-		}
-
-		internal void Maximize()
-		{
-			if (DesktopWindowXamlSource is null)
-				return;
-
-			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
-			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
-
-			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
-		}
-
-		internal void SetHWndRectRegion(RectInt32 rect)
-		{
-			if (DesktopWindowXamlSource is null)
-				return;
-
-			HRGN region = PInvoke.CreateRectRgn(rect.X, rect.Y, rect.Width, rect.Height);
-			PInvoke.SetWindowRgn(HWnd, region, false);
-			PInvoke.SetWindowRgn(_xamlHwnd, region, false);
-		}
-
-		internal void UpdateWindowVisibility(bool isVisible)
-		{
-			PInvoke.ShowWindow(HWnd, isVisible ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_HIDE);
-			if (isVisible) DesktopWindowXamlSource?.SiteBridge.Show(); else DesktopWindowXamlSource?.SiteBridge.Hide();
-		}
+#endif
 
 		private LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (uMsg)
 			{
+#if UWP
 				case PInvoke.WM_CREATE:
 					{
 						PInvoke.RoInitialize(RO_INIT_TYPE.RO_INIT_SINGLETHREADED);
@@ -227,15 +269,16 @@ namespace U5BFA.Libraries
 							PInvoke.SetFocus(_xamlHwnd);
 					}
 					break;
+				case PInvoke.WM_DESTROY:
+					{
+						PInvoke.PostQuitMessage(0);
+					}
+					break;
+#endif
 				case PInvoke.WM_ACTIVATE:
 					{
 						if (LOWORD((nint)(nuint)wParam) == PInvoke.WA_INACTIVE)
 							WindowInactivated?.Invoke(this, EventArgs.Empty);
-					}
-					break;
-				case PInvoke.WM_DESTROY:
-					{
-						PInvoke.PostQuitMessage(0);
 					}
 					break;
 				default:

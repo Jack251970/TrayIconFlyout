@@ -1,12 +1,16 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
+using Windows.UI;
+
+#if WASDK
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
-using Windows.UI;
+#endif
 
 namespace U5BFA.Libraries
 {
+#if WASDK
 	internal static class BackdropControllerHelpers
 	{
 		internal static DesktopAcrylicController? GetDarkAcrylicController(ResourceDictionary resources)
@@ -81,4 +85,5 @@ namespace U5BFA.Libraries
 			};
 		}
 	}
+#endif
 }

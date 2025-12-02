@@ -1,24 +1,28 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using Microsoft.UI.Composition;
-using Microsoft.UI.Composition.SystemBackdrops;
-using Microsoft.UI.Content;
-using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.Marshalling;
 
+#if WASDK
+using Microsoft.UI.Composition;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Content;
+using Microsoft.UI.Xaml;
+#endif
+
 namespace U5BFA.Libraries
 {
-	public partial class ContentBackdropManager : IDisposable
+#if WASDK
+	internal partial class ContentBackdropManager : IDisposable
 	{
 		private ISystemBackdropControllerWithTargets? _backdropController;
 		private SystemBackdropConfiguration? _configuration;
 		private Compositor? _compositor;
 		private readonly List<ContentExternalBackdropLink> _linkCollection = [];
 
-		public static ContentBackdropManager? Create(ISystemBackdropControllerWithTargets backdropController, Compositor compositor, ElementTheme elementTheme)
+		internal static ContentBackdropManager? Create(ISystemBackdropControllerWithTargets backdropController, Compositor compositor, ElementTheme elementTheme)
 		{
 			var configuration = new SystemBackdropConfiguration() { Theme = (SystemBackdropTheme)elementTheme };
 			backdropController.SetSystemBackdropConfiguration(configuration);
@@ -33,7 +37,7 @@ namespace U5BFA.Libraries
 				: null;
 		}
 
-		public ContentExternalBackdropLink? CreateLink()
+		internal ContentExternalBackdropLink? CreateLink()
 		{
 			if (_backdropController is null || _compositor is null)
 				return null;
@@ -45,7 +49,7 @@ namespace U5BFA.Libraries
 			return backdropLink;
 		}
 
-		public void RemoveLink(ContentExternalBackdropLink backdropLink)
+		internal void RemoveLink(ContentExternalBackdropLink backdropLink)
 		{
 			if (!_linkCollection.Contains(backdropLink))
 				return;
@@ -62,7 +66,7 @@ namespace U5BFA.Libraries
 			}
 		}
 
-		public void UpdateTheme(ElementTheme elementTheme)
+		internal void UpdateTheme(ElementTheme elementTheme)
 		{
 			if (_configuration is null)
 				return;
@@ -87,4 +91,5 @@ namespace U5BFA.Libraries
 			catch { }
 		}
 	}
+#endif
 }
