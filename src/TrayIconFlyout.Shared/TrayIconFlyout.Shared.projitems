@@ -9,10 +9,13 @@
     <Import_RootNamespace>TrayIconFlyout.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BackdropKind.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComPtr`1.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GeneralHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ManualDefinitions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemTrayIcon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TransitionHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TrayIconFlyoutIsland.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WindowHelpers.cs" />
   </ItemGroup>
   <ItemGroup>

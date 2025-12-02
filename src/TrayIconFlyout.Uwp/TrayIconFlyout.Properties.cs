@@ -59,16 +59,12 @@ namespace U5BFA.Libraries
 		{
 			if ((bool)e.NewValue == (bool)e.OldValue)
 				return;
-
-			UpdateBackdropManager(true);
 		}
 
 		partial void OnBackdropKindPropertyChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if ((BackdropKind)e.NewValue == (BackdropKind)e.OldValue)
 				return;
-
-			UpdateBackdropManager(true);
 		}
 	}
 }

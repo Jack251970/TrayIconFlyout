@@ -2,13 +2,16 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Windows.Foundation;
+using Windows.Graphics;
 using Windows.UI.Core;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Hosting;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.System.Com;
 using Windows.Win32.System.WinRT;
 using Windows.Win32.System.WinRT.Xaml;
@@ -18,56 +21,85 @@ using static Windows.Win32.ManualDefinitions;
 
 namespace U5BFA.Libraries
 {
-	[UnmanagedFunctionPointer(CallingConvention.Winapi)]
-	public delegate LRESULT WNDPROC([In] HWND hWnd, [In] uint uMsg, [In] WPARAM wParam, [In] LPARAM lParam);
-
-	public unsafe class XamlIslandHostWindow
+	public unsafe class XamlIslandHostWindow : IDisposable
 	{
-		private Application _xamlApp = null;
+		private const string WindowClassName = "TrayIconFlyoutHostClass";
+		private const string WindowName = "TrayIconFlyoutHostWindow";
 
-		private WNDPROC _wndProc = default;
+		private readonly WNDPROC _wndProc;
 
 		private HWND _hwnd = default;
 		private HWND _xamlHwnd = default;
 		private HWND _coreHwnd = default;
-
 		private bool _xamlInitialized = false;
-
-		private DesktopWindowXamlSource _desktopWindowXamlSource = null;
-		private WindowsXamlManager _xamlManager = null;
-		private CoreWindow _coreWindow = null;
+		private WindowsXamlManager? _xamlManager = null;
+		private CoreWindow? _coreWindow = null;
 
 		private ComPtr<IDesktopWindowXamlSourceNative2> _pDesktopWindowXamlSourceNative2 = default;
 
-		public required int Width { get; set; }
-
-		public required int Height { get; set; }
-
-		public XamlIslandHostWindow() { }
-
-		public void InitializeHost()
+		internal HWND HWnd
 		{
-			fixed (char* pwszClassName = "TrayIconFlyoutHostClass", pwszWindowName = "TrayIconFlyoutHostWindow")
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private set;
+		}
+
+		internal DesktopWindowXamlSource? DesktopWindowXamlSource
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private set;
+		}
+
+		internal Rect WindowSize
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
 			{
-				_wndProc = new(WndProc);
-
-				WNDCLASSW wndClass = default;
-				wndClass.lpfnWndProc = (delegate* unmanaged[Stdcall]<HWND, uint, WPARAM, LPARAM, LRESULT>)Marshal.GetFunctionPointerForDelegate(_wndProc);
-				wndClass.hInstance = PInvoke.GetModuleHandle(null);
-				wndClass.lpszClassName = pwszClassName;
-				PInvoke.RegisterClass(&wndClass);
-
-				PInvoke.CreateWindowEx(
-					WINDOW_EX_STYLE.WS_EX_NOREDIRECTIONBITMAP | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW, pwszClassName, pwszWindowName,
-					WINDOW_STYLE.WS_OVERLAPPEDWINDOW | WINDOW_STYLE.WS_VISIBLE,
-					PInvoke.CW_USEDEFAULT, PInvoke.CW_USEDEFAULT, Width, Height,
-					HWND.Null, HMENU.Null, wndClass.hInstance, null);
+				RECT rect;
+				PInvoke.GetWindowRect(HWnd, &rect);
+				return new(rect.X, rect.Y, rect.Width, rect.Height);
 			}
+		}
+
+		internal double XamlIslandRasterizationScale
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				return DesktopWindowXamlSource?.SiteBridge.SiteView.RasterizationScale ?? 1.0D;
+			}
+		}
+
+		internal event EventHandler? WindowInactivated;
+
+		internal XamlIslandHostWindow()
+		{
+			_wndProc = new(WndProc);
+		}
+
+		internal void Initialize(UIElement content)
+		{
+			WNDCLASSW wndClass = default;
+			wndClass.lpfnWndProc = (delegate* unmanaged[Stdcall]<HWND, uint, WPARAM, LPARAM, LRESULT>)Marshal.GetFunctionPointerForDelegate(_wndProc);
+			wndClass.hInstance = PInvoke.GetModuleHandle(null);
+			wndClass.lpszClassName = (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference()));
+			PInvoke.RegisterClass(&wndClass);
+
+			HWnd = PInvoke.CreateWindowEx(
+				WINDOW_EX_STYLE.WS_EX_NOREDIRECTIONBITMAP | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_TOPMOST,
+				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())),
+				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
+				WINDOW_STYLE.WS_POPUP, 0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
+
+			InitializeDesktopWindowXamlSource();
 
 			MSG msg;
 			while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0))
 			{
-				bool xamlSourceProcessedMessage = _xamlApp is not null && PreTranslateMessage(&msg);
+				bool xamlSourceProcessedMessage = !_hwnd.IsNull && PreTranslateMessage(&msg);
 				if (!xamlSourceProcessedMessage)
 				{
 					PInvoke.TranslateMessage(&msg);
@@ -76,7 +108,7 @@ namespace U5BFA.Libraries
 			}
 		}
 
-		public DesktopWindowXamlSource InitializeXamlIsland()
+		public void InitializeDesktopWindowXamlSource()
 		{
 			// Is this needed anymore? maybe for older builds?
 			fixed (char* pwszTwinApiAppCoreDll = "twinapi.appcore.dll", pwszThreadPoolWinRTDll = "threadpoolwinrt.dll")
@@ -86,15 +118,15 @@ namespace U5BFA.Libraries
 			}
 
 			_xamlManager = WindowsXamlManager.InitializeForCurrentThread();
-			_desktopWindowXamlSource = new();
+			DesktopWindowXamlSource = new();
 
 			Guid IID_IDesktopWindowXamlSourceNative2 = IDesktopWindowXamlSourceNative2.IID_Guid;
 			Guid IID_ICoreWindowInterop = ICoreWindowInterop.IID_Guid;
 
-			((IUnknown*)((IWinRTObject)_desktopWindowXamlSource).NativeObject.ThisPtr)->QueryInterface(&IID_IDesktopWindowXamlSourceNative2, (void**)_pDesktopWindowXamlSourceNative2.GetAddressOf());
+			((IUnknown*)((IWinRTObject)DesktopWindowXamlSource).NativeObject.ThisPtr)->QueryInterface(&IID_IDesktopWindowXamlSourceNative2, (void**)_pDesktopWindowXamlSourceNative2.GetAddressOf());
 
 			// For extra safety
-			GC.KeepAlive(_desktopWindowXamlSource);
+			GC.KeepAlive(DesktopWindowXamlSource);
 
 			_pDesktopWindowXamlSourceNative2.Get()->AttachToWindow(_hwnd);
 			_pDesktopWindowXamlSourceNative2.Get()->get_WindowHandle((HWND*)Unsafe.AsPointer(ref _xamlHwnd));
@@ -110,8 +142,6 @@ namespace U5BFA.Libraries
 			pCoreWindowInterop.Get()->get_WindowHandle((HWND*)Unsafe.AsPointer(ref _coreHwnd));
 
 			_xamlInitialized = true;
-
-			return _desktopWindowXamlSource;
 		}
 
 		private bool PreTranslateMessage(MSG* msg)
@@ -124,20 +154,51 @@ namespace U5BFA.Libraries
 			return result;
 		}
 
+		internal void MoveAndResize(RectInt32 rect)
+		{
+			if (DesktopWindowXamlSource is null)
+				return;
+
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, 0U);
+			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, rect.Width, rect.Height, 0U);
+		}
+
+		internal void Maximize()
+		{
+			if (DesktopWindowXamlSource is null)
+				return;
+
+			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+
+			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+		}
+
+		internal void SetHWndRectRegion(RectInt32 rect)
+		{
+			if (DesktopWindowXamlSource is null)
+				return;
+
+			HRGN region = PInvoke.CreateRectRgn(rect.X, rect.Y, rect.Width, rect.Height);
+			PInvoke.SetWindowRgn(HWnd, region, false);
+			PInvoke.SetWindowRgn(_xamlHwnd, region, false);
+		}
+
+		internal void UpdateWindowVisibility(bool isVisible)
+		{
+			PInvoke.ShowWindow(HWnd, isVisible ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_HIDE);
+			if (isVisible) DesktopWindowXamlSource?.SiteBridge.Show(); else DesktopWindowXamlSource?.SiteBridge.Hide();
+		}
+
 		private LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (uMsg)
 			{
 				case PInvoke.WM_CREATE:
 					{
-						WINDOW_STYLE lStyle = (WINDOW_STYLE)PInvoke.GetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
-						lStyle &= ~(WINDOW_STYLE.WS_CAPTION | WINDOW_STYLE.WS_THICKFRAME | WINDOW_STYLE.WS_MINIMIZEBOX | WINDOW_STYLE.WS_MAXIMIZEBOX | WINDOW_STYLE.WS_SYSMENU);
-						PInvoke.SetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, (int)lStyle);
-
 						PInvoke.RoInitialize(RO_INIT_TYPE.RO_INIT_SINGLETHREADED);
 
 						_hwnd = hWnd;
-						_xamlApp = new(this);
 					}
 					break;
 				case PInvoke.WM_SIZE:
@@ -169,17 +230,11 @@ namespace U5BFA.Libraries
 				case PInvoke.WM_ACTIVATE:
 					{
 						if (LOWORD((nint)(nuint)wParam) == PInvoke.WA_INACTIVE)
-						{
-							Debug.WriteLine("Inactive window.");
-						}
-						else
-						{
-						}
+							WindowInactivated?.Invoke(this, EventArgs.Empty);
 					}
 					break;
 				case PInvoke.WM_DESTROY:
 					{
-						_xamlApp = null;
 						PInvoke.PostQuitMessage(0);
 					}
 					break;
@@ -190,6 +245,14 @@ namespace U5BFA.Libraries
 			}
 
 			return (LRESULT)0;
+		}
+
+		public void Dispose()
+		{
+			PInvoke.DestroyWindow(HWnd);
+			PInvoke.UnregisterClass((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())), PInvoke.GetModuleHandle(null));
+			DesktopWindowXamlSource?.Dispose();
+			DesktopWindowXamlSource = null;
 		}
 	}
 }

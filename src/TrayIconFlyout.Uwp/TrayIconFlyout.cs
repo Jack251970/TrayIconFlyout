@@ -3,7 +3,6 @@
 
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media.Animation;
 using System;
@@ -24,8 +23,6 @@ namespace U5BFA.Libraries
 
 		private Grid? RootGrid;
 		private Grid? IslandsGrid;
-
-		internal ContentBackdropManager? BackdropManager { get; private set; }
 
 		public bool IsOpen { get; private set; }
 
@@ -101,43 +98,6 @@ namespace U5BFA.Libraries
 				storyboard.Begin();
 				storyboard.Completed += CloseAnimationStoryboard_Completed;
 			}
-		}
-
-		private void UpdateBackdropManager(bool coerce = false)
-		{
-			var isTaskbarLight = GeneralHelpers.IsTaskbarLight();
-			var isTaskbarColorPrevalence = GeneralHelpers.IsTaskbarColorPrevalenceEnabled();
-			bool shouldUpdateBackdrop = _wasTaskbarLightLastTimeChecked != isTaskbarLight || _wasTaskbarColorPrevalenceLastTimeChecked != isTaskbarColorPrevalence;
-			_wasTaskbarLightLastTimeChecked = isTaskbarLight;
-			_wasTaskbarColorPrevalenceLastTimeChecked = isTaskbarColorPrevalence;
-			if (!shouldUpdateBackdrop && !coerce)
-				return;
-
-			ISystemBackdropControllerWithTargets? controller = BackdropKind is BackdropKind.Acrylic
-				? (isTaskbarColorPrevalence
-					? BackdropControllerHelpers.GetAccentedAcrylicController(Resources)
-					: isTaskbarLight
-						? BackdropControllerHelpers.GetLightAcrylicController(Resources)
-						: BackdropControllerHelpers.GetDarkAcrylicController(Resources))
-				: (isTaskbarColorPrevalence
-					? BackdropControllerHelpers.GetAccentedMicaController(Resources)
-					: isTaskbarLight
-						? BackdropControllerHelpers.GetLightMicaController(Resources)
-						: BackdropControllerHelpers.GetDarkMicaController(Resources));
-			if (controller is null)
-				return;
-
-			BackdropManager?.Dispose();
-			BackdropManager = null;
-			BackdropManager = ContentBackdropManager.Create(controller, ElementCompositionPreview.GetElementVisual(IslandsGrid).Compositor, ActualTheme);
-
-			UpdateBackdrop(true);
-		}
-
-		private void UpdateBackdrop(bool coerce = false)
-		{
-			foreach (var island in Islands)
-				island.UpdateBackdrop(IsBackdropEnabled, coerce);
 		}
 
 		private void UpdateFlyoutTheme()
@@ -237,7 +197,6 @@ namespace U5BFA.Libraries
 
 		public void Dispose()
 		{
-			BackdropManager?.Dispose();
 			_host?.WindowInactivated -= HostWindow_Inactivated;
 			_host?.Dispose();
 		}

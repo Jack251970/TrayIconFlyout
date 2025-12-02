@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace U5BFA.Libraries
 {
@@ -22,7 +22,6 @@ namespace U5BFA.Libraries
 
 		private void OnCornerRadiusChanged()
 		{
-			UpdateBackdropVisual();
 		}
 	}
 }

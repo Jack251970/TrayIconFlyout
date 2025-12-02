@@ -11,24 +11,7 @@ namespace U5BFA.Libraries
 {
 	public partial class TrayIconFlyoutIsland : ContentControl
 	{
-		private const string PART_RootGrid = "PART_RootGrid";
-		private const string PART_BackdropTargetGrid = "PART_BackdropTargetGrid";
-		private const string PART_MainContentPresenter = "PART_MainContentPresenter";
-
-		private WeakReference<TrayIconFlyout>? _owner;
 		private ContentExternalBackdropLink? _backdropLink;
-		private bool _isBackdropLinkAttached;
-		private long _propertyChangedCallbackTokenForContentProperty;
-		private long _propertyChangedCallbackTokenForCornerRadiusProperty;
-
-		private Grid? RootGrid;
-		private Grid? BackdropTargetGrid;
-		private ContentPresenter? MainContentPresenter;
-
-		public TrayIconFlyoutIsland()
-		{
-			DefaultStyleKey = typeof(TrayIconFlyoutIsland);
-		}
 
 		protected override void OnApplyTemplate()
 		{

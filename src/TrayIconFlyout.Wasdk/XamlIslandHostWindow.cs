@@ -80,13 +80,9 @@ namespace U5BFA.Libraries
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
 				WINDOW_STYLE.WS_POPUP, 0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
 
-			////PInvoke.SetLayeredWindowAttributes(HWnd, (COLORREF)0, 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
-
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
 			DesktopWindowXamlSource.Content = content;
-
-			//PInvoke.SetLayeredWindowAttributes((HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value, (COLORREF)0, 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
 		}
 
 		internal void MoveAndResize(RectInt32 rect)
@@ -144,7 +140,7 @@ namespace U5BFA.Libraries
 			return (LRESULT)0;
 		}
 
-		public unsafe void Dispose()
+		public void Dispose()
 		{
 			PInvoke.DestroyWindow(HWnd);
 			PInvoke.UnregisterClass((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())), PInvoke.GetModuleHandle(null));

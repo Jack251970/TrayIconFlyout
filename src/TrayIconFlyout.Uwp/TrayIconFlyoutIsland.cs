@@ -3,32 +3,12 @@
 
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Hosting;
 using System;
 
 namespace U5BFA.Libraries
 {
 	public partial class TrayIconFlyoutIsland : ContentControl
 	{
-		private const string PART_RootGrid = "PART_RootGrid";
-		private const string PART_BackdropTargetGrid = "PART_BackdropTargetGrid";
-		private const string PART_MainContentPresenter = "PART_MainContentPresenter";
-
-		private WeakReference<TrayIconFlyout>? _owner;
-		private ContentExternalBackdropLink? _backdropLink;
-		private bool _isBackdropLinkAttached;
-		private long _propertyChangedCallbackTokenForContentProperty;
-		private long _propertyChangedCallbackTokenForCornerRadiusProperty;
-
-		private Grid? RootGrid;
-		private Grid? BackdropTargetGrid;
-		private ContentPresenter? MainContentPresenter;
-
-		public TrayIconFlyoutIsland()
-		{
-			DefaultStyleKey = typeof(TrayIconFlyoutIsland);
-		}
-
 		protected override void OnApplyTemplate()
 		{
 			base.OnApplyTemplate();
@@ -59,66 +39,8 @@ namespace U5BFA.Libraries
 			_owner = new(owner);
 		}
 
-		internal void UpdateBackdrop(bool isEnabled, bool coerce = false)
-		{
-			if (_owner is null || !_owner.TryGetTarget(out var owner) || owner.BackdropManager is null)
-				return;
-
-			if (isEnabled)
-			{
-				if (_isBackdropLinkAttached)
-				{
-					if (coerce)
-					{
-						if (_backdropLink is null)
-							return;
-
-						owner.BackdropManager.RemoveLink(_backdropLink);
-						_backdropLink = null;
-						_isBackdropLinkAttached = false;
-					}
-					else
-					{
-						return;
-					}
-				}
-
-				_backdropLink = owner.BackdropManager.CreateLink();
-				_isBackdropLinkAttached = true;
-				UpdateBackdropVisual();
-			}
-			else
-			{
-				if (_backdropLink is null)
-					return;
-
-				owner.BackdropManager.RemoveLink(_backdropLink);
-				_backdropLink = null;
-				_isBackdropLinkAttached = false;
-			}
-		}
-
-		internal void UpdateBackdropVisual()
-		{
-			if (BackdropTargetGrid is null || _backdropLink is null || Content is not FrameworkElement element)
-				return;
-
-			_backdropLink.PlacementVisual.Size = new((float)ActualWidth, (float)ActualHeight);
-			_backdropLink.PlacementVisual.Clip = _backdropLink.PlacementVisual.Compositor.CreateRectangleClip(
-				0, 0, 
-				(float)MainContentPresenter.ActualWidth, 
-				(float)MainContentPresenter.ActualHeight,
-				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopLeft - 1), Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopLeft - 1)),
-				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopRight - 1), Convert.ToSingle(BackdropTargetGrid.CornerRadius.TopRight - 1)),
-				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomRight - 1), Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomRight - 1)),
-				new(Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomLeft - 1), Convert.ToSingle(BackdropTargetGrid.CornerRadius.BottomLeft - 1)));
-
-			ElementCompositionPreview.SetElementChildVisual(BackdropTargetGrid, _backdropLink.PlacementVisual);
-		}
-
 		private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			UpdateBackdropVisual();
 		}
 	}
 }

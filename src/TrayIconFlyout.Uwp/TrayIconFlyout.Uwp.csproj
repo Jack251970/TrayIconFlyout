@@ -5,17 +5,33 @@
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<Platforms>x86;x64;arm64</Platforms>
 		<UseUwp>true</UseUwp>
-		<UseUwpTools>true</UseUwpTools>
 		<Nullable>enable</Nullable>
 		<DefaultLanguage>en-US</DefaultLanguage>
 		<IsAotCompatible>true</IsAotCompatible>
 		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
 		<LangVersion>preview</LangVersion>
 		<DefineConstants>$(DefineConstants);UWP</DefineConstants>
+
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>0x5BFA.TrayIconFlyout.WinUI</PackageId>
+		<Title>0x5BFA.TrayIconFlyout.WinUI</Title>
+		<Authors>0x5BFA</Authors>
+		<Version>1.0.0-preview2</Version>
+		<Description>Empower your app with a flyout that pops up from a tray icon.</Description>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/0x5bfa/TrayIconFlyout</RepositoryUrl>
+		<PackageTags>Shell Flyout WinUI WindowsAppSDK WASDK Windows</PackageTags>
+	
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Labs.WinUI.DependencyPropertyGenerator" Version="0.1.251030-build.2370" />
+		<None Include="..\..\.nuget\README.md" Pack="true" PackagePath="" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Labs.Uwp.DependencyPropertyGenerator" Version="0.1.251101-build.2372" />
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.257" PrivateAssets="all" />
 	</ItemGroup>
 
