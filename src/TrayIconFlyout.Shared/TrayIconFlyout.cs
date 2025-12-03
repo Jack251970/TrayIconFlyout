@@ -5,9 +5,10 @@ using System;
 using System.Threading.Tasks;
 
 #if UWP
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media.Animation;
 #elif WASDK
@@ -40,8 +41,6 @@ namespace U5BFA.Libraries
 #endif
 
 		public bool IsOpen { get; private set; }
-
-		public event EventHandler? Inactivated;
 
 		public TrayIconFlyout()
 		{
@@ -79,10 +78,16 @@ namespace U5BFA.Libraries
 			_ = Task.Run(async () =>
 			{
 				await Task.Delay(1);
+#if UWP
+				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+#elif WASDK
 				RootGrid.DispatcherQueue.TryEnqueue(() =>
+#endif
 				{
 					UpdateFlyoutTheme();
+#if WASDK
 					UpdateBackdropManager();
+#endif
 					UpdateFlyoutRegion();
 					_host.UpdateWindowVisibility(true);
 
@@ -115,6 +120,7 @@ namespace U5BFA.Libraries
 			}
 		}
 
+#if WASDK
 		private void UpdateBackdropManager(bool coerce = false)
 		{
 			var isTaskbarLight = GeneralHelpers.IsTaskbarLight();
@@ -151,6 +157,7 @@ namespace U5BFA.Libraries
 			foreach (var island in Islands)
 				island.UpdateBackdrop(IsBackdropEnabled, coerce);
 		}
+#endif
 
 		private void UpdateFlyoutTheme()
 		{
@@ -249,7 +256,9 @@ namespace U5BFA.Libraries
 
 		public void Dispose()
 		{
+#if WASDK
 			BackdropManager?.Dispose();
+#endif
 			_host?.WindowInactivated -= HostWindow_Inactivated;
 			_host?.Dispose();
 		}

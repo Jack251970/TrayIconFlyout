@@ -12,6 +12,9 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace U5BFA.Libraries
 {
+	/// <summary>
+	/// Provides functionality for displaying and managing a system tray icon in the taskbar.
+	/// </summary>
 	public unsafe class SystemTrayIcon
 	{
 		private const uint WM_UNIQUE_MESSAGE = 2048U;
@@ -24,13 +27,16 @@ namespace U5BFA.Libraries
 
 		private bool _created;
 
-		public required string IconPath { get; set; }
-		public required string Tooltip { get; set; }
-		public required Guid Id { get; set; }
+		public required string IconPath { get; init; }
+		public required string Tooltip { get; init; }
+		public required Guid Id { get; init; }
 
 		public event EventHandler<MouseEventReceivedEventArgs>? LeftClicked;
 		public event EventHandler<MouseEventReceivedEventArgs>? RightClicked;
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="SystemTrayIcon"/>.
+		/// </summary>
 		public SystemTrayIcon()
 		{
 			_taskbarRestartMessageId = PInvoke.RegisterWindowMessage((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "TaskbarCreated".GetPinnableReference())));
@@ -46,14 +52,17 @@ namespace U5BFA.Libraries
 
 			_hWnd = PInvoke.CreateWindowEx(
 				WINDOW_EX_STYLE.WS_EX_LEFT, (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in TrayIconWindowClassName.GetPinnableReference())),
-				null, WINDOW_STYLE.WS_OVERLAPPED, 0, 0, 1, 1, HWND.Null, HMENU.Null, HINSTANCE.Null, null);
+				null, WINDOW_STYLE.WS_OVERLAPPED, X: 0, Y: 0, nWidth: 1, nHeight: 1, HWND.Null, HMENU.Null, HINSTANCE.Null, null);
 		}
 
+		/// <summary>
+		/// Displays the notification icon in the system tray, creating it if necessary or updating its appearance and tooltip if it already exists.
+		/// </summary>
 		public void Show()
 		{
-			HICON hIcon = default;
-			fixed (char* pwszIconPath = IconPath)
-				hIcon = (HICON)(void*)PInvoke.LoadImage(HINSTANCE.Null, pwszIconPath, GDI_IMAGE_TYPE.IMAGE_ICON, 0, 0, IMAGE_FLAGS.LR_LOADFROMFILE | IMAGE_FLAGS.LR_DEFAULTSIZE);
+			HICON hIcon = (HICON)(void*)PInvoke.LoadImage(
+				HINSTANCE.Null, (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in IconPath.GetPinnableReference())),
+				GDI_IMAGE_TYPE.IMAGE_ICON, cx: 0, cy: 0, IMAGE_FLAGS.LR_LOADFROMFILE | IMAGE_FLAGS.LR_DEFAULTSIZE);
 
 			NOTIFYICONDATAW data = default;
 			data.cbSize = (uint)sizeof(NOTIFYICONDATAW);
@@ -72,32 +81,49 @@ namespace U5BFA.Libraries
 			{
 				PInvoke.Shell_NotifyIcon(NOTIFY_ICON_MESSAGE.NIM_DELETE, &data);
 				PInvoke.Shell_NotifyIcon(NOTIFY_ICON_MESSAGE.NIM_ADD, &data);
-
 				data.Anonymous.uVersion = 4u;
-
-				// Set the icon handler version
-				// NOTE: Do not omit this code. If you remove, the icon won't be shown.
 				PInvoke.Shell_NotifyIcon(NOTIFY_ICON_MESSAGE.NIM_SETVERSION, &data);
 
 				_created = true;
 			}
 		}
 
+		/// <summary>
+		/// Removes the associated notification icon from the system tray.
+		/// </summary>
 		public void Destroy()
 		{
 			if (_created)
 			{
-				_created = false;
-
 				NOTIFYICONDATAW data = default;
 				data.cbSize = (uint)sizeof(NOTIFYICONDATAW);
 				data.hWnd = _hWnd;
 				data.guidItem = Id;
 				data.uFlags = NOTIFY_ICON_DATA_FLAGS.NIF_MESSAGE | NOTIFY_ICON_DATA_FLAGS.NIF_ICON | NOTIFY_ICON_DATA_FLAGS.NIF_TIP | NOTIFY_ICON_DATA_FLAGS.NIF_GUID | NOTIFY_ICON_DATA_FLAGS.NIF_SHOWTIP;
 
-				// Delete the existing icon
 				PInvoke.Shell_NotifyIcon(NOTIFY_ICON_MESSAGE.NIM_DELETE, &data);
+
+				_created = false;
 			}
+		}
+
+		private Point GetCenterPointOfTrayIcon(HWND hWnd)
+		{
+			NOTIFYICONIDENTIFIER nii = default;
+			nii.cbSize = (uint)sizeof(NOTIFYICONIDENTIFIER);
+			nii.hWnd = hWnd;
+			nii.guidItem = Id;
+
+			RECT rect = default;
+			Point point = default;
+			HRESULT hr = PInvoke.Shell_NotifyIconGetRect(&nii, &rect);
+			if (SUCCEEDED(hr))
+			{
+				point.X = rect.right - (rect.Width / 2);
+				point.Y = rect.bottom - (rect.Height / 2);
+			}
+
+			return point;
 		}
 
 		private LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)
@@ -106,13 +132,14 @@ namespace U5BFA.Libraries
 			{
 				case WM_UNIQUE_MESSAGE:
 					{
-						switch ((uint)(lParam.Value & 0xFFFF))
+						switch ((uint)LOWORD(lParam.Value))
 						{
 							case PInvoke.WM_LBUTTONUP:
 								{
 									PInvoke.SetForegroundWindow(hWnd);
 									var point = GetCenterPointOfTrayIcon(hWnd);
-									LeftClicked?.Invoke(this, new MouseEventReceivedEventArgs(point));
+									if (!point.IsEmpty)
+										LeftClicked?.Invoke(this, new MouseEventReceivedEventArgs(point));
 
 									break;
 								}
@@ -120,7 +147,8 @@ namespace U5BFA.Libraries
 								{
 									PInvoke.SetForegroundWindow(hWnd);
 									var point = GetCenterPointOfTrayIcon(hWnd);
-									RightClicked?.Invoke(this, new MouseEventReceivedEventArgs(point));
+									if (!point.IsEmpty)
+										RightClicked?.Invoke(this, new MouseEventReceivedEventArgs(point));
 
 									break;
 								}
@@ -136,6 +164,7 @@ namespace U5BFA.Libraries
 					}
 				default:
 					{
+						// Taskbar was restarted, recreate the icon
 						if (uMsg == _taskbarRestartMessageId)
 						{
 							Destroy();
@@ -146,33 +175,6 @@ namespace U5BFA.Libraries
 					}
 			}
 			return default;
-		}
-
-		private Point GetCenterPointOfTrayIcon(HWND hWnd)
-		{
-			var notifyIconIdentifier = new NOTIFYICONIDENTIFIER
-			{
-				cbSize = (uint)sizeof(NOTIFYICONIDENTIFIER),
-				hWnd = hWnd,
-				guidItem = Id,
-			};
-
-			RECT rect = default;
-
-			int hr = PInvoke.Shell_NotifyIconGetRect(&notifyIconIdentifier, &rect);
-			if (hr != 0) Marshal.ThrowExceptionForHR(hr);
-
-			return new Point(rect.right - (rect.Width / 2), rect.bottom - (rect.Height / 2));
-		}
-	}
-
-	public class MouseEventReceivedEventArgs : EventArgs
-	{
-		public Point Point { get; }
-
-		internal MouseEventReceivedEventArgs(Point point)
-		{
-			Point = point;
 		}
 	}
 }

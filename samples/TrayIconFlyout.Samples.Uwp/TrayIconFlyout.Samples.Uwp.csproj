@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
-		<TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
-		<UseUwp>true</UseUwp>
-		<UseUwpTools>true</UseUwpTools>
-		<Platforms>x64;arm64;x86</Platforms>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<Platforms>x86;x64;arm64</Platforms>
 		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-		<DefaultLanguage>en-US</DefaultLanguage>
 		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
-		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<EnableMsixTooling>true</EnableMsixTooling>
+		<RootNamespace>U5BFA.Libraries</RootNamespace>
+		<Nullable>enable</Nullable>
 		<PublishAot>true</PublishAot>
 		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<EnableMsixTooling>true</EnableMsixTooling>
 
-		<DisableEmbeddedXbf>true</DisableEmbeddedXbf>
-		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+		<UseUwp>true</UseUwp>
+		<UseUwpTools>true</UseUwpTools>
+
 	</PropertyGroup>
 
 	<ItemGroup>

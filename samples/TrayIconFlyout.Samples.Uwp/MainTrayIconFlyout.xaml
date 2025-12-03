@@ -82,11 +82,11 @@
 				Background="Transparent"
 				BorderBrush="Transparent"
 				BorderThickness="0">
-				<AnimatedIcon>
-					<AnimatedIcon.Source>
+				<muxc:AnimatedIcon>
+					<muxc:AnimatedIcon.Source>
 						<animatedvisuals:AnimatedSettingsVisualSource />
-					</AnimatedIcon.Source>
-				</AnimatedIcon>
+					</muxc:AnimatedIcon.Source>
+				</muxc:AnimatedIcon>
 			</Button>
 
 		</Grid>

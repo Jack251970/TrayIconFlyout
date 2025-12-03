@@ -4,6 +4,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using Windows.Foundation;
 using Windows.Graphics;
 using Windows.Win32;
@@ -42,7 +43,7 @@ namespace U5BFA.Libraries
 		private WindowsXamlManager? _xamlManager = null;
 		private CoreWindow? _coreWindow = null;
 
-		private ComPtr<IDesktopWindowXamlSourceNative2> _pDesktopWindowXamlSourceNative2 = default;
+		private IDesktopWindowXamlSourceNative2 _pdwxsn2 = null!;
 #endif
 
 		internal HWND HWnd
@@ -77,7 +78,11 @@ namespace U5BFA.Libraries
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get
 			{
+#if UWP
+				return 1.0D;
+#else
 				return DesktopWindowXamlSource?.SiteBridge.SiteView.RasterizationScale ?? 1.0D;
+#endif
 			}
 		}
 
@@ -119,6 +124,12 @@ namespace U5BFA.Libraries
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
 			DesktopWindowXamlSource.Content = content;
+
+			void* ppv;
+			((IUnknown*)((IWinRTObject)DesktopWindowXamlSource).NativeObject.ThisPtr)->QueryInterface(
+				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_IDesktopWindowXamlSourceNative2)), &ppv);
+
+			var count = ((IUnknown*)ppv)->AddRef();
 #endif
 		}
 
@@ -194,17 +205,21 @@ namespace U5BFA.Libraries
 			DesktopWindowXamlSource = new();
 
 			// QI for IDesktopWindowXamlSourceNative2
+			void* ppv;
 			((IUnknown*)((IWinRTObject)DesktopWindowXamlSource).NativeObject.ThisPtr)->QueryInterface(
-				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_IDesktopWindowXamlSourceNative2)), (void**)_pDesktopWindowXamlSourceNative2.GetAddressOf());
+				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_IDesktopWindowXamlSourceNative2)), &ppv);
+
+			var count = ((IUnknown*)ppv)->AddRef();
+
+			var sbcw = new StrategyBasedComWrappers();
+			_pdwxsn2 = (IDesktopWindowXamlSourceNative2)sbcw.GetOrCreateObjectForComInstance((nint)ppv, CreateObjectFlags.None);
 
 			// For extra safety
 			GC.KeepAlive(DesktopWindowXamlSource);
 
-			// Set the base HWND
-			_pDesktopWindowXamlSourceNative2.Get()->AttachToWindow(_hwnd);
-
-			// Get the XAML island HWND
-			_pDesktopWindowXamlSourceNative2.Get()->get_WindowHandle((HWND*)Unsafe.AsPointer(ref _xamlHwnd));
+			// Set the base HWND and get the XAML island HWND
+			_pdwxsn2.AttachToWindow(_hwnd);
+			_pdwxsn2.get_WindowHandle((HWND*)Unsafe.AsPointer(ref _xamlHwnd));
 
 			RECT wRect;
 			PInvoke.GetClientRect(_hwnd, &wRect);
@@ -212,10 +227,11 @@ namespace U5BFA.Libraries
 
 			// Get CoreWindow and its HWND
 			_coreWindow = CoreWindow.GetForCurrentThread();
-			using ComPtr<ICoreWindowInterop> pCoreWindowInterop = default;
 			((IUnknown*)((IWinRTObject)_coreWindow).NativeObject.ThisPtr)->QueryInterface(
-				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_ICoreWindowInterop)), (void**)pCoreWindowInterop.GetAddressOf());
-			pCoreWindowInterop.Get()->get_WindowHandle((HWND*)Unsafe.AsPointer(ref _coreHwnd));
+				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_ICoreWindowInterop)), &ppv);
+
+			var pcwi = (ICoreWindowInterop)sbcw.GetOrCreateObjectForComInstance((nint)ppv, CreateObjectFlags.None);
+			pcwi.get_WindowHandle((HWND*)Unsafe.AsPointer(ref _coreHwnd));
 
 			_xamlInitialized = true;
 		}
@@ -225,7 +241,7 @@ namespace U5BFA.Libraries
 			BOOL result = false;
 
 			if (_xamlInitialized)
-				_pDesktopWindowXamlSourceNative2.Get()->PreTranslateMessage(msg, &result);
+				_pdwxsn2.PreTranslateMessage(msg, &result);
 
 			return result;
 		}

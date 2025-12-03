@@ -23,6 +23,7 @@ env:
   WORKING_DIR:           '${{ github.workspace }}' # 'D:\a\TrayIconFlyout\TrayIconFlyout'
   SOLUTION_PATH:         '${{ github.workspace }}\TrayIconFlyout.slnx'
   WASDK_APP_CSPROJ_PATH: '${{ github.workspace }}\samples\TrayIconFlyout.Samples.Wasdk\TrayIconFlyout.Samples.Wasdk.csproj'
+  UWP_APP_CSPROJ_PATH:   '${{ github.workspace }}\samples\TrayIconFlyout.Samples.Uwp\TrayIconFlyout.Samples.Uwp.csproj'
 
 jobs:
   build:
@@ -52,3 +53,6 @@ jobs:
 
     - name: Build the sample app (WASDK)
       run: msbuild /restore $env:WASDK_APP_CSPROJ_PATH /p:Configuration=$env:CONFIGURATION /p:Platform=$env:PLATFORM /p:AppxBundle=Never
+
+    - name: Build the sample app (UWP)
+      run: msbuild /restore $env:UWP_APP_CSPROJ_PATH /p:Configuration=$env:CONFIGURATION /p:Platform=$env:PLATFORM /p:AppxBundle=Never

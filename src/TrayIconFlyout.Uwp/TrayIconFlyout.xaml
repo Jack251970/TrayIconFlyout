@@ -1,9 +1,7 @@
 <ResourceDictionary
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-	xmlns:local="using:U5BFA.Libraries"
-	xmlns:systembackdrops="using:Microsoft.UI.Composition.SystemBackdrops">
+	xmlns:local="using:U5BFA.Libraries">
 
 	<Style BasedOn="{StaticResource DefaultWindows11TrayIconFlyoutStyle}" TargetType="local:TrayIconFlyout" />
 	<Style BasedOn="{StaticResource DefaultTrayIconFlyoutIslandStyle}" TargetType="local:TrayIconFlyoutIsland" />

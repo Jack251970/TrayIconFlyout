@@ -2,11 +2,18 @@
 // Licensed under the MIT license.
 
 using CommunityToolkit.WinUI;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+#if UWP
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+#elif WASDK
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+#endif
 
 namespace U5BFA.Libraries
 {
@@ -60,7 +67,9 @@ namespace U5BFA.Libraries
 			if ((bool)e.NewValue == (bool)e.OldValue)
 				return;
 
+#if WASDK
 			UpdateBackdropManager(true);
+#endif
 		}
 
 		partial void OnBackdropKindPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -68,7 +77,9 @@ namespace U5BFA.Libraries
 			if ((BackdropKind)e.NewValue == (BackdropKind)e.OldValue)
 				return;
 
+#if WASDK
 			UpdateBackdropManager(true);
+#endif
 		}
 	}
 }

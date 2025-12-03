@@ -32,7 +32,7 @@ namespace U5BFA.Libraries
 				Window.Current.Activate();
 			}
 
-			TrayIconManager.Default.Initialize();
+			//TrayIconManager.Default.Initialize();
 		}
 
 		private void OnSuspending(object sender, SuspendingEventArgs e)

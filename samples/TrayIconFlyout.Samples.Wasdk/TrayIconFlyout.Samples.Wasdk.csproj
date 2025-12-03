@@ -1,21 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<Platforms>x86;x64;ARM64</Platforms>
+		<Platforms>x86;x64;arm64</Platforms>
 		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
 		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
-		<UseWinUI>true</UseWinUI>
-		<EnableMsixTooling>true</EnableMsixTooling>
+		<RootNamespace>U5BFA.Libraries</RootNamespace>
 		<Nullable>enable</Nullable>
 		<PublishAot>true</PublishAot>
 		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<EnableMsixTooling>true</EnableMsixTooling>
+		
+		<UseWinUI>true</UseWinUI>
 		<HasPackageAndPublishMenu Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">true</HasPackageAndPublishMenu>
+
 	</PropertyGroup>
 
 	<ItemGroup>
