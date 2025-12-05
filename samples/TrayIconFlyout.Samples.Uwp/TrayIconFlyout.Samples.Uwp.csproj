@@ -16,6 +16,7 @@
 		<LangVersion>preview</LangVersion>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<EnableMsixTooling>true</EnableMsixTooling>
+		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 
 		<UseUwp>true</UseUwp>
 		<UseUwpTools>true</UseUwpTools>

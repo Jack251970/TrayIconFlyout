@@ -15,6 +15,9 @@ using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.System.WinRT;
 using Windows.Win32.System.Com;
 using WinRT;
+using Windows.System;
+using System.Threading;
+
 
 #if UWP
 using Windows.UI.Core;
@@ -28,7 +31,7 @@ using Microsoft.UI.Xaml.Hosting;
 
 namespace U5BFA.Libraries
 {
-	internal unsafe partial class XamlIslandHostWindow : IDisposable
+	public unsafe partial class XamlIslandHostWindow : IDisposable
 	{
 		private const string WindowClassName = "TrayIconFlyoutHostClass";
 		private const string WindowName = "TrayIconFlyoutHostWindow";
@@ -36,7 +39,6 @@ namespace U5BFA.Libraries
 		private readonly WNDPROC _wndProc;
 
 #if UWP
-		private HWND _hwnd = default;
 		private HWND _xamlHwnd = default;
 		private HWND _coreHwnd = default;
 		private bool _xamlInitialized = false;
@@ -88,49 +90,41 @@ namespace U5BFA.Libraries
 
 		internal event EventHandler? WindowInactivated;
 
-		internal XamlIslandHostWindow()
+		public XamlIslandHostWindow()
 		{
 			_wndProc = new(WndProc);
-		}
 
-		internal void Initialize(UIElement content)
-		{
 			WNDCLASSW wndClass = default;
 			wndClass.lpfnWndProc = (delegate* unmanaged[Stdcall]<HWND, uint, WPARAM, LPARAM, LRESULT>)Marshal.GetFunctionPointerForDelegate(_wndProc);
 			wndClass.hInstance = PInvoke.GetModuleHandle(null);
 			wndClass.lpszClassName = (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference()));
 			PInvoke.RegisterClass(&wndClass);
 
-			HWnd = PInvoke.CreateWindowEx(
+			PInvoke.CreateWindowEx(
 				WINDOW_EX_STYLE.WS_EX_NOREDIRECTIONBITMAP | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_TOPMOST,
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())),
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
 				WINDOW_STYLE.WS_POPUP, 0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
 
 #if UWP
-			InitializeDesktopWindowXamlSource();
-
-			MSG msg;
-			while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0))
+			MSG msg; BOOL fRes;
+			while (PInvoke.GetMessage(&msg, HWND.Null, 0U, 0U))
 			{
-				bool xamlSourceProcessedMessage = !_hwnd.IsNull && PreTranslateMessage(&msg);
-				if (!xamlSourceProcessedMessage)
+				if (!_xamlInitialized || FAILED(_pdwxsn2.PreTranslateMessage(&msg, &fRes)) || !fRes)
 				{
 					PInvoke.TranslateMessage(&msg);
 					PInvoke.DispatchMessage(&msg);
 				}
 			}
-#else
+#elif WASDK
 			DesktopWindowXamlSource = new();
 			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
-			DesktopWindowXamlSource.Content = content;
-
-			void* ppv;
-			((IUnknown*)((IWinRTObject)DesktopWindowXamlSource).NativeObject.ThisPtr)->QueryInterface(
-				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_IDesktopWindowXamlSourceNative2)), &ppv);
-
-			var count = ((IUnknown*)ppv)->AddRef();
 #endif
+		}
+
+		internal void SetContent(UIElement content)
+		{
+			DesktopWindowXamlSource?.Content = content;
 		}
 
 		internal void MoveAndResize(RectInt32 rect)
@@ -209,8 +203,6 @@ namespace U5BFA.Libraries
 			((IUnknown*)((IWinRTObject)DesktopWindowXamlSource).NativeObject.ThisPtr)->QueryInterface(
 				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IID.IID_IDesktopWindowXamlSourceNative2)), &ppv);
 
-			var count = ((IUnknown*)ppv)->AddRef();
-
 			var sbcw = new StrategyBasedComWrappers();
 			_pdwxsn2 = (IDesktopWindowXamlSourceNative2)sbcw.GetOrCreateObjectForComInstance((nint)ppv, CreateObjectFlags.None);
 
@@ -218,11 +210,11 @@ namespace U5BFA.Libraries
 			GC.KeepAlive(DesktopWindowXamlSource);
 
 			// Set the base HWND and get the XAML island HWND
-			_pdwxsn2.AttachToWindow(_hwnd);
+			_pdwxsn2.AttachToWindow(HWnd);
 			_pdwxsn2.get_WindowHandle((HWND*)Unsafe.AsPointer(ref _xamlHwnd));
 
 			RECT wRect;
-			PInvoke.GetClientRect(_hwnd, &wRect);
+			PInvoke.GetClientRect(HWnd, &wRect);
 			PInvoke.SetWindowPos(_xamlHwnd, HWND.Null, 0, 0, wRect.right - wRect.left, wRect.bottom - wRect.top, SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER);
 
 			// Get CoreWindow and its HWND
@@ -232,18 +224,8 @@ namespace U5BFA.Libraries
 
 			var pcwi = (ICoreWindowInterop)sbcw.GetOrCreateObjectForComInstance((nint)ppv, CreateObjectFlags.None);
 			pcwi.get_WindowHandle((HWND*)Unsafe.AsPointer(ref _coreHwnd));
-
+			
 			_xamlInitialized = true;
-		}
-
-		private bool PreTranslateMessage(MSG* msg)
-		{
-			BOOL result = false;
-
-			if (_xamlInitialized)
-				_pdwxsn2.PreTranslateMessage(msg, &result);
-
-			return result;
 		}
 #endif
 
@@ -256,7 +238,8 @@ namespace U5BFA.Libraries
 					{
 						PInvoke.RoInitialize(RO_INIT_TYPE.RO_INIT_SINGLETHREADED);
 
-						_hwnd = hWnd;
+						HWnd = hWnd;
+						InitializeDesktopWindowXamlSource();
 					}
 					break;
 				case PInvoke.WM_SIZE:

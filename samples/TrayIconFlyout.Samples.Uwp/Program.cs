@@ -1,15 +1,16 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
-using Windows.UI.Xaml;
+using System;
 
 namespace U5BFA.Libraries
 {
-	public partial class App : Application
+	public class Program
 	{
-		public App()
+		[STAThread]
+		static void Main()
 		{
-			TrayIconManager.Default.Initialize();
+			_ = new App();
 		}
 	}
 }

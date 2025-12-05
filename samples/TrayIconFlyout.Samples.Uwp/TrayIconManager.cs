@@ -2,8 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using Windows.UI.Xaml.Hosting;
-using Windows.Win32;
 
 namespace U5BFA.Libraries
 {
@@ -27,6 +25,8 @@ namespace U5BFA.Libraries
 				Tooltip = "TrayIconFlyout sample app (UWP)",
 				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
 			};
+
+			// TODO: Initialize the XAML Island here first
 
 			TrayIconFlyout = new MainTrayIconFlyout();
 			_trayIconMenuFlyout = new MainTrayIconMeunFlyout();

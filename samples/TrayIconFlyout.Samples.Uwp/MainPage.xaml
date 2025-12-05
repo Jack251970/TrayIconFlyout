@@ -6,6 +6,5 @@
 	xmlns:local="using:U5BFA.Libraries"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-	mc:Ignorable="d">
-	<TextBlock Text="A" />
-</Page>
+	muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
+	mc:Ignorable="d" />

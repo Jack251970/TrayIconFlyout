@@ -47,7 +47,7 @@ namespace U5BFA.Libraries
 			DefaultStyleKey = typeof(TrayIconFlyout);
 
 			_host = new XamlIslandHostWindow();
-			_host.Initialize(this);
+			_host.SetContent(this);
 			_host.UpdateWindowVisibility(false);
 			_host.WindowInactivated += HostWindow_Inactivated;
 		}
