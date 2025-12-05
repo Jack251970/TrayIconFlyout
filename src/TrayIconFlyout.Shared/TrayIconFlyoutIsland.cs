@@ -22,7 +22,9 @@ namespace U5BFA.Libraries
 		private const string PART_MainContentPresenter = "PART_MainContentPresenter";
 
 		private Grid? RootGrid;
+#if WASDK
 		private Grid? BackdropTargetGrid;
+#endif
 		private ContentPresenter? MainContentPresenter;
 
 #if WASDK
@@ -46,8 +48,10 @@ namespace U5BFA.Libraries
 
 			RootGrid = GetTemplateChild(PART_RootGrid) as Grid
 				?? throw new MissingFieldException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
+#if WASDK
 			BackdropTargetGrid = GetTemplateChild(PART_BackdropTargetGrid) as Grid
 				?? throw new MissingFieldException($"Could not find {PART_BackdropTargetGrid} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
+#endif
 			MainContentPresenter = GetTemplateChild(PART_MainContentPresenter) as ContentPresenter
 				?? throw new MissingFieldException($"Could not find {PART_MainContentPresenter} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
 

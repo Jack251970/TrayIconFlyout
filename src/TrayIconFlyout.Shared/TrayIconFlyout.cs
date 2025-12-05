@@ -11,6 +11,9 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
+
 #elif WASDK
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
@@ -120,6 +123,13 @@ namespace U5BFA.Libraries
 				storyboard.Completed += CloseAnimationStoryboard_Completed;
 			}
 		}
+
+#if UWP
+		public unsafe bool TryPreTranslateMessage(MSG* msg)
+		{
+			return _host?.TryPreTranslateMessage(msg) ?? false;
+		}
+#endif
 
 #if WASDK
 		private void UpdateBackdropManager(bool coerce = false)

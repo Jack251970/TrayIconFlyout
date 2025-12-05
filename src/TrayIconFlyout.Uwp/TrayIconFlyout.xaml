@@ -53,6 +53,7 @@
 				<ControlTemplate TargetType="local:TrayIconFlyoutIsland">
 					<Grid
 						x:Name="PART_RootGrid"
+						Background="{TemplateBinding Background}"
 						BorderBrush="{TemplateBinding BorderBrush}"
 						BorderThickness="{TemplateBinding BorderThickness}"
 						CornerRadius="{TemplateBinding CornerRadius}"
@@ -60,8 +61,6 @@
 						<Grid.Shadow>
 							<ThemeShadow />
 						</Grid.Shadow>
-
-						<Grid x:Name="PART_BackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
 
 						<ContentPresenter x:Name="PART_MainContentPresenter" />
 					</Grid>

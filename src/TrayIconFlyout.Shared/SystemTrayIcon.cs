@@ -57,14 +57,6 @@ namespace U5BFA.Libraries
 		}
 
 		/// <summary>
-		/// Starts message loop. Call this method only if you don't have a message loop in your UI thread.
-		/// </summary>
-		public void StartMessageLoop()
-		{
-			// TODO
-		}
-
-		/// <summary>
 		/// Displays the notification icon in the system tray, creating it if necessary or updating its appearance and tooltip if it already exists.
 		/// </summary>
 		public void Show()

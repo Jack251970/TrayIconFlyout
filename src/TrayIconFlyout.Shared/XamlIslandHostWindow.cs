@@ -5,8 +5,10 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using System.Threading;
 using Windows.Foundation;
 using Windows.Graphics;
+using Windows.System;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -15,8 +17,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.System.WinRT;
 using Windows.Win32.System.Com;
 using WinRT;
-using Windows.System;
-using System.Threading;
+using System.Runtime.InteropServices.JavaScript;
 
 
 #if UWP
@@ -31,7 +32,7 @@ using Microsoft.UI.Xaml.Hosting;
 
 namespace U5BFA.Libraries
 {
-	public unsafe partial class XamlIslandHostWindow : IDisposable
+	internal unsafe partial class XamlIslandHostWindow : IDisposable
 	{
 		private const string WindowClassName = "TrayIconFlyoutHostClass";
 		private const string WindowName = "TrayIconFlyoutHostWindow";
@@ -91,7 +92,7 @@ namespace U5BFA.Libraries
 
 		internal event EventHandler? WindowInactivated;
 
-		public XamlIslandHostWindow()
+		internal XamlIslandHostWindow()
 		{
 			_wndProc = new(WndProc);
 
@@ -146,14 +147,25 @@ namespace U5BFA.Libraries
 #endif
 		}
 
+#if UWP
+		public bool TryPreTranslateMessage(MSG* msg)
+		{
+			BOOL result = false;
+
+			_pdwxsn2.PreTranslateMessage(msg, &result);
+
+			return result;
+		}
+#endif
+
 		private void InitializeDesktopWindowXamlSource()
 		{
 			DesktopWindowXamlSource = new();
 
 #if UWP
 			// NOTE: Is this needed anymore? maybe for older builds?
-			//PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "twinapi.appcore.dll".GetPinnableReference())));
-			//PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "threadpoolwinrt.dll".GetPinnableReference())));
+			PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "twinapi.appcore.dll".GetPinnableReference())));
+			PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "threadpoolwinrt.dll".GetPinnableReference())));
 
 			// QI for IDesktopWindowXamlSourceNative2
 			void* ppv;
@@ -173,6 +185,9 @@ namespace U5BFA.Libraries
 			RECT wRect;
 			PInvoke.GetClientRect(HWnd, &wRect);
 			PInvoke.SetWindowPos(_xamlHwnd, HWND.Null, 0, 0, wRect.right - wRect.left, wRect.bottom - wRect.top, SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER);
+
+			var xst = Window.Current.As<IXamlSourceTransparency>();
+			xst.set_IsBackgroundTransparent(true);
 
 			// Get CoreWindow and its HWND
 			_coreWindow = CoreWindow.GetForCurrentThread();

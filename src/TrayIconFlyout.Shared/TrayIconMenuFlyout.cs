@@ -10,6 +10,9 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
+using Windows.Win32.UI.WindowsAndMessaging;
+using Windows.Win32.Foundation;
+
 #elif WASDK
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
@@ -90,6 +93,13 @@ namespace U5BFA.Libraries
 
 			IsOpen = false;
 		}
+
+#if UWP
+		public unsafe bool TryPreTranslateMessage(MSG* msg)
+		{
+			return _host?.TryPreTranslateMessage(msg) ?? false;
+		}
+#endif
 
 		private void UpdateFlyoutTheme()
 		{

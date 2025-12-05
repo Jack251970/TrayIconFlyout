@@ -46,7 +46,7 @@ namespace U5BFA.Libraries
 			MSG msg;
 			while (PInvoke.GetMessage(&msg, HWND.Null, 0U, 0U))
 			{
-				if (!TryPreTranslateMessage())
+				if (!TryPreTranslateMessage(&msg))
 				{
 					PInvoke.TranslateMessage(&msg);
 					PInvoke.DispatchMessage(&msg);
@@ -54,14 +54,10 @@ namespace U5BFA.Libraries
 			}
 		}
 
-		private static bool TryPreTranslateMessage()
+		private static unsafe bool TryPreTranslateMessage(MSG* msg)
 		{
-			BOOL result = false;
-
-			//if (_xamlInitialized)
-			//	_pdwxsn2.PreTranslateMessage(msg, &result);
-
-			return result;
+			return (_trayIconFlyout?.TryPreTranslateMessage(msg) ?? false) ||
+				(_trayIconMenuFlyout?.TryPreTranslateMessage(msg) ?? false);
 		}
 
 		private static void SystemTrayIcon_LeftClicked(object? sender, MouseEventReceivedEventArgs e)
