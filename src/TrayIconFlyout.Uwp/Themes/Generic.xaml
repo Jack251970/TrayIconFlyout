@@ -7,7 +7,7 @@
 	<ResourceDictionary.MergedDictionaries>
 
 		<!--#region TrayIconFlyout-->
-		<ResourceDictionary Source="ms-appx:///TrayIconFlyout.Wasdk/TrayIconFlyout.xaml" />
+		<ResourceDictionary Source="ms-appx:///TrayIconFlyout.Uwp/TrayIconFlyout.xaml" />
 		<!--#endregion-->
 
 	</ResourceDictionary.MergedDictionaries>

@@ -78,8 +78,9 @@ namespace U5BFA.Libraries
 			_ = Task.Run(async () =>
 			{
 				await Task.Delay(1);
+
 #if UWP
-				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+				await RootGrid.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal, () =>
 #elif WASDK
 				RootGrid.DispatcherQueue.TryEnqueue(() =>
 #endif

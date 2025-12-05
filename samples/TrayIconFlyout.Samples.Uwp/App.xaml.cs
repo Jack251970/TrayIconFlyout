@@ -1,15 +1,89 @@
 ﻿// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
+using System;
+using System.Threading;
+using Windows.System;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Hosting;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.System.WinRT;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace U5BFA.Libraries
 {
 	public partial class App : Application
 	{
-		public App()
+		private static SystemTrayIcon? _systemTrayIcon;
+		private static TrayIconFlyout? _trayIconFlyout;
+		private static TrayIconMenuFlyout? _trayIconMenuFlyout;
+
+		public unsafe App()
 		{
-			TrayIconManager.Default.Initialize();
+			PInvoke.RoInitialize(RO_INIT_TYPE.RO_INIT_SINGLETHREADED);
+
+			_systemTrayIcon = new SystemTrayIcon()
+			{
+				IconPath = "Assets\\Tray.ico",
+				Tooltip = "TrayIconFlyout sample app (UWP)",
+				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
+			};
+
+			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
+			_systemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
+			_systemTrayIcon.Show();
+
+			// Initialize XAML Island
+			WindowsXamlManager.InitializeForCurrentThread();
+			SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread()));
+
+			// Initialize XAML flyouts
+			_trayIconFlyout = new MainTrayIconFlyout();
+			_trayIconFlyout.HideOnLostFocus = false;
+			_trayIconMenuFlyout = new MainTrayIconMeunFlyout();
+
+			MSG msg;
+			while (PInvoke.GetMessage(&msg, HWND.Null, 0U, 0U))
+			{
+				if (!TryPreTranslateMessage())
+				{
+					PInvoke.TranslateMessage(&msg);
+					PInvoke.DispatchMessage(&msg);
+				}
+			}
+		}
+
+		private static bool TryPreTranslateMessage()
+		{
+			BOOL result = false;
+
+			//if (_xamlInitialized)
+			//	_pdwxsn2.PreTranslateMessage(msg, &result);
+
+			return result;
+		}
+
+		private static void SystemTrayIcon_LeftClicked(object? sender, MouseEventReceivedEventArgs e)
+		{
+			if (_trayIconFlyout is null)
+				return;
+
+			if (_trayIconFlyout.IsOpen)
+				_trayIconFlyout.Hide();
+			else
+				_trayIconFlyout.Show();
+		}
+
+		private static void SystemTrayIcon_RightClicked(object? sender, MouseEventReceivedEventArgs e)
+		{
+			if (_trayIconMenuFlyout is null)
+				return;
+
+			if (_trayIconMenuFlyout.IsOpen)
+				_trayIconMenuFlyout.Hide();
+
+			_trayIconMenuFlyout.Show(e.Point);
 		}
 	}
 }

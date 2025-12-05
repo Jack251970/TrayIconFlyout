@@ -38,8 +38,9 @@ namespace U5BFA.Libraries
 
 		private readonly WNDPROC _wndProc;
 
-#if UWP
 		private HWND _xamlHwnd = default;
+
+#if UWP
 		private HWND _coreHwnd = default;
 		private bool _xamlInitialized = false;
 		private WindowsXamlManager? _xamlManager = null;
@@ -100,81 +101,38 @@ namespace U5BFA.Libraries
 			wndClass.lpszClassName = (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference()));
 			PInvoke.RegisterClass(&wndClass);
 
-			PInvoke.CreateWindowEx(
+			HWnd = PInvoke.CreateWindowEx(
 				WINDOW_EX_STYLE.WS_EX_NOREDIRECTIONBITMAP | WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_TOPMOST,
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowClassName.GetPinnableReference())),
 				(PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in WindowName.GetPinnableReference())),
 				WINDOW_STYLE.WS_POPUP, 0, 0, 0, 0, HWND.Null, HMENU.Null, wndClass.hInstance, null);
 
-#if UWP
-			MSG msg; BOOL fRes;
-			while (PInvoke.GetMessage(&msg, HWND.Null, 0U, 0U))
-			{
-				if (!_xamlInitialized || FAILED(_pdwxsn2.PreTranslateMessage(&msg, &fRes)) || !fRes)
-				{
-					PInvoke.TranslateMessage(&msg);
-					PInvoke.DispatchMessage(&msg);
-				}
-			}
-#elif WASDK
-			DesktopWindowXamlSource = new();
-			DesktopWindowXamlSource.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
-#endif
+			InitializeDesktopWindowXamlSource();
 		}
 
 		internal void SetContent(UIElement content)
 		{
-			DesktopWindowXamlSource?.Content = content;
+			DesktopWindowXamlSource!.Content = content;
 		}
 
 		internal void MoveAndResize(RectInt32 rect)
 		{
-			if (DesktopWindowXamlSource is null)
-				return;
-
 			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, 0U);
-
-			PInvoke.SetWindowPos(
-#if UWP
-				_xamlHwnd,
-#else
-				(HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value,
-#endif
-				HWND.HWND_TOP, 0, 0, rect.Width, rect.Height, 0U);
+			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, rect.Width, rect.Height, 0U);
 		}
 
 		internal void Maximize()
 		{
-			if (DesktopWindowXamlSource is null)
-				return;
-
 			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
 			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
-
-			PInvoke.SetWindowPos(
-#if UWP
-				_xamlHwnd,
-#else
-				(HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value,
-#endif
-				HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
 		}
 
 		internal void SetHWndRectRegion(RectInt32 rect)
 		{
-			if (DesktopWindowXamlSource is null)
-				return;
-
 			HRGN region = PInvoke.CreateRectRgn(rect.X, rect.Y, rect.Width, rect.Height);
 			PInvoke.SetWindowRgn(HWnd, region, false);
-
-			PInvoke.SetWindowRgn(
-#if UWP
-				_xamlHwnd,
-#else
-				(HWND)DesktopWindowXamlSource.SiteBridge.WindowId.Value,
-#endif
-				region, false);
+			PInvoke.SetWindowRgn(_xamlHwnd, region, false);
 		}
 
 		internal void UpdateWindowVisibility(bool isVisible)
@@ -188,15 +146,14 @@ namespace U5BFA.Libraries
 #endif
 		}
 
-#if UWP
 		private void InitializeDesktopWindowXamlSource()
 		{
-			// NOTE: Is this needed anymore? maybe for older builds?
-			PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "twinapi.appcore.dll".GetPinnableReference())));
-			PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "threadpoolwinrt.dll".GetPinnableReference())));
-
-			_xamlManager = WindowsXamlManager.InitializeForCurrentThread();
 			DesktopWindowXamlSource = new();
+
+#if UWP
+			// NOTE: Is this needed anymore? maybe for older builds?
+			//PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "twinapi.appcore.dll".GetPinnableReference())));
+			//PInvoke.LoadLibrary((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "threadpoolwinrt.dll".GetPinnableReference())));
 
 			// QI for IDesktopWindowXamlSourceNative2
 			void* ppv;
@@ -226,22 +183,18 @@ namespace U5BFA.Libraries
 			pcwi.get_WindowHandle((HWND*)Unsafe.AsPointer(ref _coreHwnd));
 			
 			_xamlInitialized = true;
-		}
+
+#elif WASDK
+			DesktopWindowXamlSource!.Initialize(Win32Interop.GetWindowIdFromWindow(HWnd));
+			_xamlHwnd = (HWND)(nint)DesktopWindowXamlSource.SiteBridge.WindowId.Value;
 #endif
+		}
 
 		private LRESULT WndProc(HWND hWnd, uint uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (uMsg)
 			{
 #if UWP
-				case PInvoke.WM_CREATE:
-					{
-						PInvoke.RoInitialize(RO_INIT_TYPE.RO_INIT_SINGLETHREADED);
-
-						HWnd = hWnd;
-						InitializeDesktopWindowXamlSource();
-					}
-					break;
 				case PInvoke.WM_SIZE:
 					{
 						var x = LOWORD(lParam);

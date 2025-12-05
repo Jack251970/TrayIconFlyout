@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\..\src\TrayIconFlyout.Uwp\TrayIconFlyout.Uwp.props" />
+
 	<PropertyGroup>
 
 		<OutputType>WinExe</OutputType>
@@ -16,7 +18,6 @@
 		<LangVersion>preview</LangVersion>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<EnableMsixTooling>true</EnableMsixTooling>
-		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 
 		<UseUwp>true</UseUwp>
 		<UseUwpTools>true</UseUwpTools>

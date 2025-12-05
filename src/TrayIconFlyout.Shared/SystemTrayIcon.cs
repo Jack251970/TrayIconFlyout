@@ -31,6 +31,7 @@ namespace U5BFA.Libraries
 		public required string Tooltip { get; init; }
 		public required Guid Id { get; init; }
 
+		public event EventHandler? IconDestroyed;
 		public event EventHandler<MouseEventReceivedEventArgs>? LeftClicked;
 		public event EventHandler<MouseEventReceivedEventArgs>? RightClicked;
 
@@ -53,6 +54,14 @@ namespace U5BFA.Libraries
 			_hWnd = PInvoke.CreateWindowEx(
 				WINDOW_EX_STYLE.WS_EX_LEFT, (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in TrayIconWindowClassName.GetPinnableReference())),
 				null, WINDOW_STYLE.WS_OVERLAPPED, X: 0, Y: 0, nWidth: 1, nHeight: 1, HWND.Null, HMENU.Null, HINSTANCE.Null, null);
+		}
+
+		/// <summary>
+		/// Starts message loop. Call this method only if you don't have a message loop in your UI thread.
+		/// </summary>
+		public void StartMessageLoop()
+		{
+			// TODO
 		}
 
 		/// <summary>
@@ -159,6 +168,7 @@ namespace U5BFA.Libraries
 				case PInvoke.WM_DESTROY:
 					{
 						Destroy();
+						IconDestroyed?.Invoke(this, EventArgs.Empty);
 
 						break;
 					}

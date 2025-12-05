@@ -5,7 +5,6 @@
 	xmlns:local="using:U5BFA.Libraries">
 
 	<ResourceDictionary.MergedDictionaries>
-		<XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
 
 		<!--#region TrayIconFlyout-->
 		<ResourceDictionary Source="ms-appx:///TrayIconFlyout.Wasdk/TrayIconFlyout.xaml" />
