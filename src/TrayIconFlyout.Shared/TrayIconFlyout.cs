@@ -10,6 +10,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -81,26 +82,37 @@ namespace U5BFA.Libraries
 				return;
 
 			_isPopupAnimationPlaying = true;
-
 			_host.Maximize();
-
-			UpdateLayout();
 
 			_ = Task.Run(async () =>
 			{
-				await Task.Delay(1);
-
 #if UWP
-				await RootGrid.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal, () =>
+				await RootGrid.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal, async () =>
 #elif WASDK
-				RootGrid.DispatcherQueue.TryEnqueue(() =>
+				RootGrid.DispatcherQueue.TryEnqueue(async () =>
 #endif
 				{
+					UpdateLayout();
+					await Task.Delay(1);
+
 					UpdateFlyoutTheme();
 #if WASDK
 					UpdateBackdropManager();
 #endif
 					UpdateFlyoutRegion();
+
+					// Ensure to hide first
+					if (RootGrid.RenderTransform is TranslateTransform translateTransform)
+					{
+						if (PopupDirection is Orientation.Vertical)
+							translateTransform.Y = DesiredSize.Height;
+						else
+							translateTransform.X = DesiredSize.Width;
+					}
+
+					UpdateLayout();
+					await Task.Delay(1);
+
 					_host.UpdateWindowVisibility(true);
 
 					if (IsTransitionAnimationEnabled)
