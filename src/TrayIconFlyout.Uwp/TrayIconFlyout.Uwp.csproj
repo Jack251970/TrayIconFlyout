@@ -16,6 +16,7 @@
 		<DefineConstants>$(DefineConstants);UWP</DefineConstants>
 
 		<UseUwp>true</UseUwp>
+		<DisableEmbeddedXbf>false</DisableEmbeddedXbf>
 
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>0x5BFA.TrayIconFlyout.Uwp</PackageId>

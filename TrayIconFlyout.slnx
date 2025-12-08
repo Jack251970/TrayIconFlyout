@@ -16,12 +16,11 @@
   <Folder Name="/.nuget/">
     <File Path=".nuget/README.md" />
   </Folder>
-
-  <Folder Name="/samples/">
+  <Folder Name="/samples-uwp/">
     <Project Path="samples/TrayIconFlyout.Uwp.Sample.Packaging/TrayIconFlyout.Uwp.Sample.Packaging.wapproj" Type="c7167f0d-bc9f-4e6e-afe1-012c56b48db5" Id="8f9f53a2-0cda-4bb2-b6e9-060ce608dfb2">
       <Deploy />
     </Project>
-    <Project Path="samples/TrayIconFlyout.Uwp.Sample/TrayIconFlyout.Uwp.Sample.csproj">
+    <Project Path="samples/TrayIconFlyout.Uwp.Sample.TrayHost/TrayIconFlyout.Uwp.Sample.TrayHost.csproj">
       <Platform Solution="*|Any CPU" Project="x64" />
       <Platform Solution="*|ARM" Project="x64" />
       <Platform Solution="*|ARM64" Project="arm64" />
@@ -29,7 +28,9 @@
       <Platform Solution="*|x86" Project="x86" />
       <Deploy />
     </Project>
-    <Project Path="samples/TrayIconFlyout.Wasdk.Sample/TrayIconFlyout.Wasdk.Sample.csproj">
+  </Folder>
+  <Folder Name="/samples-wasdk/">
+    <Project Path="samples/TrayIconFlyout.Wasdk.Sample.App/TrayIconFlyout.Wasdk.Sample.App.csproj">
       <Platform Solution="*|Any CPU" Project="x64" />
       <Platform Solution="*|ARM" Project="x64" />
       <Platform Solution="*|ARM64" Project="ARM64" />

@@ -21,6 +21,7 @@
 
 		<UseUwp>true</UseUwp>
 		<UseUwpTools>true</UseUwpTools>
+		<DisableEmbeddedXbf>false</DisableEmbeddedXbf>
 
 	</PropertyGroup>
 
