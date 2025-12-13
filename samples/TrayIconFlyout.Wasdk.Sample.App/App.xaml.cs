@@ -19,11 +19,14 @@ namespace U5BFA.Libraries
 
 		protected override void OnLaunched(LaunchActivatedEventArgs args)
 		{
+			TrayIconManager.Default.Initialize(new(
+				"Assets\\Tray.ico",
+				"TrayIconFlyout sample app (WASDK)",
+				new("28DE460A-8BD6-4539-A406-5F685584FD4D")));
+
 			_window = new MainWindow();
 			_window.Activate();
 			_window.DispatcherQueue.EnsureSystemDispatcherQueue();
-
-			TrayIconManager.Default.Initialize();
 		}
 
 		private void AppDomain_ProcessExit(object? sender, EventArgs e)

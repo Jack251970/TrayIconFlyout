@@ -10,28 +10,21 @@ namespace U5BFA.Libraries
 		private static readonly Lazy<TrayIconManager> _default = new(() => new TrayIconManager());
 		internal static TrayIconManager Default => _default.Value;
 
-		private SystemTrayIcon? _systemTrayIcon;
-		private TrayIconMenuFlyout? _trayIconMenuFlyout;
-
+		internal SystemTrayIcon? SystemTrayIcon { get; set; }
 		internal TrayIconFlyout? TrayIconFlyout { get; set; }
+		internal TrayIconMenuFlyout? TrayIconMenuFlyout { get; set; }
 
 		private TrayIconManager() { }
 
-		internal void Initialize()
+		internal void Initialize(SystemTrayIcon trayIcon)
 		{
-			_systemTrayIcon = new SystemTrayIcon()
-			{
-				IconPath = "Assets\\Tray.ico",
-				Tooltip = "TrayIconFlyout sample app (WASDK)",
-				Id = new Guid("28DE460A-8BD6-4539-A406-5F685584FD4D")
-			};
-
 			TrayIconFlyout = new MainTrayIconFlyout();
-			_trayIconMenuFlyout = new MainTrayIconMeunFlyout();
+			TrayIconMenuFlyout = new MainTrayIconMeunFlyout();
 
-			_systemTrayIcon.Show();
-			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
-			_systemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
+			SystemTrayIcon = trayIcon;
+			SystemTrayIcon.Show();
+			SystemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
+			SystemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
 		}
 
 		private void SystemTrayIcon_LeftClicked(object? sender, MouseEventReceivedEventArgs e)
@@ -47,20 +40,20 @@ namespace U5BFA.Libraries
 
 		private void SystemTrayIcon_RightClicked(object? sender, MouseEventReceivedEventArgs e)
 		{
-			if (_trayIconMenuFlyout is null)
+			if (TrayIconMenuFlyout is null)
 				return;
 
-			if (_trayIconMenuFlyout.IsOpen)
-				_trayIconMenuFlyout.Hide();
+			if (TrayIconMenuFlyout.IsOpen)
+				TrayIconMenuFlyout.Hide();
 
-			_trayIconMenuFlyout.Show(new(e.Point.X, e.Point.Y - 32));
+			TrayIconMenuFlyout.Show(new(e.Point.X, e.Point.Y - 32));
 		}
 
 		public void Dispose()
 		{
-			_systemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
-			_systemTrayIcon?.RightClicked -= SystemTrayIcon_RightClicked;
-			_systemTrayIcon?.Destroy();
+			SystemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
+			SystemTrayIcon?.RightClicked -= SystemTrayIcon_RightClicked;
+			SystemTrayIcon?.Destroy();
 			TrayIconFlyout?.Dispose();
 		}
 	}

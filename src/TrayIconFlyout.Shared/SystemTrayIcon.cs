@@ -27,9 +27,40 @@ namespace U5BFA.Libraries
 
 		private bool _created;
 
-		public required string IconPath { get; init; }
-		public required string Tooltip { get; init; }
-		public required Guid Id { get; init; }
+		private string _IconPath;
+		public string IconPath
+		{
+			get => _IconPath;
+			set
+			{
+				_IconPath = value;
+				Show();
+			}
+		}
+
+		private string _Tooltip;
+		public string Tooltip
+		{
+			get => _Tooltip;
+			set
+			{
+				_Tooltip = value;
+				Show();
+			}
+		}
+
+		private bool _IsVisible;
+		public bool IsVisible
+		{
+			get => _IsVisible;
+			set
+			{
+				_IsVisible = value;
+				Show();
+			}
+		}
+
+		public Guid Id { get; }
 
 		public event EventHandler? IconDestroyed;
 		public event EventHandler<MouseEventReceivedEventArgs>? LeftClicked;
@@ -38,11 +69,15 @@ namespace U5BFA.Libraries
 		/// <summary>
 		/// Initializes a new instance of <see cref="SystemTrayIcon"/>.
 		/// </summary>
-		public SystemTrayIcon()
+		public SystemTrayIcon(string iconPath, string tooltip, Guid id, bool isVisible = true)
 		{
 			_taskbarRestartMessageId = PInvoke.RegisterWindowMessage((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "TaskbarCreated".GetPinnableReference())));
-
 			_wndProc = new(WndProc);
+
+			_IconPath = iconPath;
+			_Tooltip = tooltip;
+			Id = id;
+			_IsVisible = isVisible;
 
 			WNDCLASSW wndClass = default;
 			wndClass.style = WNDCLASS_STYLES.CS_DBLCLKS;
@@ -71,7 +106,8 @@ namespace U5BFA.Libraries
 			data.uCallbackMessage = WM_UNIQUE_MESSAGE;
 			data.hIcon = hIcon;
 			data.guidItem = Id;
-			data.uFlags = NOTIFY_ICON_DATA_FLAGS.NIF_MESSAGE | NOTIFY_ICON_DATA_FLAGS.NIF_ICON | NOTIFY_ICON_DATA_FLAGS.NIF_TIP | NOTIFY_ICON_DATA_FLAGS.NIF_GUID | NOTIFY_ICON_DATA_FLAGS.NIF_SHOWTIP;
+			data.dwState = IsVisible ? 0U : NOTIFY_ICON_STATE.NIS_HIDDEN;
+			data.uFlags = NOTIFY_ICON_DATA_FLAGS.NIF_MESSAGE | NOTIFY_ICON_DATA_FLAGS.NIF_ICON | NOTIFY_ICON_DATA_FLAGS.NIF_TIP | NOTIFY_ICON_DATA_FLAGS.NIF_STATE | NOTIFY_ICON_DATA_FLAGS.NIF_GUID | NOTIFY_ICON_DATA_FLAGS.NIF_SHOWTIP;
 			data.szTip = Tooltip ?? string.Empty;
 
 			if (_created)

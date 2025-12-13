@@ -11,6 +11,12 @@ namespace U5BFA.Libraries
 {
 	internal partial class RootViewModel : ObservableObject
 	{
+		[ObservableProperty()]
+		internal partial string? IconPath { get; set; }
+
+		[ObservableProperty()]
+		internal partial string? TooltipText { get; set; }
+
 		[ObservableProperty]
 		internal partial bool IsBackdropEnabled { get; set; }
 
@@ -32,6 +38,9 @@ namespace U5BFA.Libraries
 
 		internal RootViewModel()
 		{
+			IconPath = TrayIconManager.Default.SystemTrayIcon?.IconPath;
+			TooltipText = TrayIconManager.Default.SystemTrayIcon?.Tooltip;
+
 			IsBackdropEnabled = true;
 			HideOnLostFocus = true;
 
@@ -48,6 +57,16 @@ namespace U5BFA.Libraries
 			Backdrops.Add(BackdropKind.Acrylic, "Acrylic");
 			Backdrops.Add(BackdropKind.Mica, "Mica");
 			SelectedBackdropIndex = 0;
+		}
+
+		partial void OnIconPathChanged(string? value)
+		{
+			TrayIconManager.Default.SystemTrayIcon?.IconPath = value ?? string.Empty;
+		}
+
+		partial void OnTooltipTextChanged(string? value)
+		{
+			TrayIconManager.Default.SystemTrayIcon?.Tooltip = value ?? string.Empty;
 		}
 
 		partial void OnIsBackdropEnabledChanged(bool value)

@@ -23,12 +23,10 @@ namespace U5BFA.Libraries
 		{
 			PInvoke.RoInitialize(RO_INIT_TYPE.RO_INIT_SINGLETHREADED);
 
-			_systemTrayIcon = new SystemTrayIcon()
-			{
-				IconPath = "Assets\\Tray.ico",
-				Tooltip = "TrayIconFlyout sample app (UWP)",
-				Id = new Guid("022F5158-F05A-4FE1-B356-34F14B363625")
-			};
+			_systemTrayIcon = new(
+				"Assets\\Tray.ico",
+				"TrayIconFlyout sample app (UWP)",
+				new("022F5158-F05A-4FE1-B356-34F14B363625"));
 
 			_systemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
 			_systemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
