@@ -40,6 +40,4 @@
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.257" PrivateAssets="all" />
 	</ItemGroup>
 
-	<Import Project="..\TrayIconFlyout.Shared\TrayIconFlyout.Shared.projitems" Label="Shared" />
-
 </Project>
