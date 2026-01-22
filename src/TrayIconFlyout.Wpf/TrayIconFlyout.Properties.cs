@@ -1,4 +1,4 @@
-﻿// Copyright (c) 0x5BFA. All rights reserved.
+﻿// Copyright (c) Jack251970. All rights reserved.
 // Licensed under the MIT license.
 
 using System.Collections.Generic;
