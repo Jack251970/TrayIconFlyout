@@ -30,9 +30,9 @@ namespace U5BFA.Libraries
 			base.OnApplyTemplate();
 
 			RootGrid = GetTemplateChild(PART_RootGrid) as Grid
-				?? throw new MissingMemberException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
+				?? throw new InvalidOperationException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
 			MainContentPresenter = GetTemplateChild(PART_MainContentPresenter) as ContentPresenter
-				?? throw new MissingMemberException($"Could not find {PART_MainContentPresenter} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
+				?? throw new InvalidOperationException($"Could not find {PART_MainContentPresenter} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
 
 			Unloaded += TrayIconFlyoutIsland_Unloaded;
 		}

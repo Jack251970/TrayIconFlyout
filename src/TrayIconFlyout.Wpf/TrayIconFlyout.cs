@@ -55,9 +55,9 @@ namespace U5BFA.Libraries
 			base.OnApplyTemplate();
 
 			RootGrid = GetTemplateChild(PART_RootGrid) as Grid
-				?? throw new MissingMemberException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyout)}'s style.");
+				?? throw new InvalidOperationException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyout)}'s style.");
 			IslandsGrid = GetTemplateChild(PART_IslandsGrid) as Grid
-				?? throw new MissingMemberException($"Could not find {PART_IslandsGrid} in the given {nameof(TrayIconFlyout)}'s style.");
+				?? throw new InvalidOperationException($"Could not find {PART_IslandsGrid} in the given {nameof(TrayIconFlyout)}'s style.");
 
 			UpdateIslands();
 		}
