@@ -48,6 +48,9 @@ namespace U5BFA.Libraries
 			};
 
 			_host.Deactivated += HostWindow_Deactivated;
+
+			// Force template application so OnApplyTemplate is called
+			ApplyTemplate();
 		}
 
 		public override void OnApplyTemplate()
