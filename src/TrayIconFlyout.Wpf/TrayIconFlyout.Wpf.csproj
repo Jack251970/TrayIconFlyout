@@ -37,8 +37,8 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <None Include="..\TrayIconFlyout.Shared\NativeMethods.json" Link="NativeMethods.json" />
-		<None Include="..\TrayIconFlyout.Shared\NativeMethods.txt" Link="NativeMethods.txt" />
+	  <AdditionalFiles Include="..\TrayIconFlyout.Shared\NativeMethods.json" Link="NativeMethods.json" />
+		<AdditionalFiles Include="..\TrayIconFlyout.Shared\NativeMethods.txt" Link="NativeMethods.txt" />
 	</ItemGroup>
 
 	<ItemGroup>
