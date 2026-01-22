@@ -1,16 +1,24 @@
-﻿<Window x:Class="U5BFA.Libraries.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:tb="http://www.hardcodet.net/taskbar"
-        Title="TrayIconFlyout WPF Sample" Height="450" Width="800"
-        WindowState="Minimized" ShowInTaskbar="False">
+﻿<Window
+    x:Class="U5BFA.Libraries.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:tb="http://www.hardcodet.net/taskbar"
+    Title="TrayIconFlyout WPF Sample"
+    Width="800"
+    Height="450"
+    ShowInTaskbar="False"
+    WindowState="Minimized">
     <Grid>
-        <tb:TaskbarIcon x:Name="TrayIcon"
-                       IconSource="/Assets/AppIcon.ico"
-                       ToolTipText="TrayIconFlyout WPF Sample"
-                       TrayMouseDoubleClick="TrayIcon_TrayMouseDoubleClick" />
-        
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                  FontSize="24" Text="WPF Sample - Check the System Tray!" />
+        <tb:TaskbarIcon
+            x:Name="TrayIcon"
+            IconSource="/Assets/AppIcon.ico"
+            ToolTipText="TrayIconFlyout WPF Sample"
+            TrayMouseDoubleClick="TrayIcon_TrayMouseDoubleClick" />
+
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontSize="24"
+            Text="WPF Sample - Check the System Tray!" />
     </Grid>
 </Window>
