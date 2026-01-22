@@ -1,7 +1,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:U5BFA.Libraries;assembly=TrayIconFlyout.Wpf">
+    xmlns:local="clr-namespace:U5BFA.Libraries">
 
     <Style BasedOn="{StaticResource DefaultWindows11TrayIconFlyoutStyle}" TargetType="{x:Type local:TrayIconFlyout}" />
     <Style BasedOn="{StaticResource DefaultTrayIconFlyoutIslandStyle}" TargetType="{x:Type local:TrayIconFlyoutIsland}" />
