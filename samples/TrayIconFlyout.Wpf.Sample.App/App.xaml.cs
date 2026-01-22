@@ -23,7 +23,7 @@ namespace U5BFA.Libraries
                 new("056EACEE-82B0-48AC-A6E9-34DAE5CD37F3")));
 
             _window = new MainWindow();
-            _window.Activate();
+            _window.Show();
         }
 
         private void AppDomain_ProcessExit(object? sender, EventArgs e)
