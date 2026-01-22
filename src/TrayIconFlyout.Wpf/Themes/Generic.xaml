@@ -7,7 +7,7 @@
     <ResourceDictionary.MergedDictionaries>
 
         <!--#region TrayIconFlyout-->
-        <ResourceDictionary Source="pack://application:,,,/TrayIconFlyout.Wpf;component/TrayIconFlyout.xaml" />
+        <ResourceDictionary Source="/TrayIconFlyout.Wpf;component/TrayIconFlyout.xaml" />
         <!--#endregion-->
 
     </ResourceDictionary.MergedDictionaries>
