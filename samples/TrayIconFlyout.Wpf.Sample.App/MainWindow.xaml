@@ -9,12 +9,6 @@
     ShowInTaskbar="False"
     WindowState="Minimized">
     <Grid>
-        <tb:TaskbarIcon
-            x:Name="TrayIcon"
-            IconSource="/Assets/AppIcon.ico"
-            ToolTipText="TrayIconFlyout WPF Sample"
-            TrayMouseDoubleClick="TrayIcon_TrayMouseDoubleClick" />
-
         <TextBlock
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
