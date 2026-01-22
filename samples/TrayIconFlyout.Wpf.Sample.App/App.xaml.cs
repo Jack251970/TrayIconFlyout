@@ -12,8 +12,6 @@ namespace U5BFA.Libraries
 
         public App()
         {
-            InitializeComponent();
-
             AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
         }
 
