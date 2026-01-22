@@ -51,7 +51,7 @@ else
     _trayIconFlyout.Show();
 ```
 
-### TrayIconMeunFlyout
+### TrayIconMenuFlyout
 
 ```xml
 <me:TrayIconMenuFlyout x:Class="..." ...>
