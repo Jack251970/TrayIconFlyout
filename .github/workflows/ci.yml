@@ -85,6 +85,8 @@ jobs:
 
   build-wpf:
     runs-on: windows-latest
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
