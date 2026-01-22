@@ -29,6 +29,17 @@
 		<PackageTags>Shell System Tray Icon Flyout WPF Windows</PackageTags>
 	
 	</PropertyGroup>
+	
+	<ItemGroup>
+	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\ManualDefinitions.cs" Link="Helpers\ManualDefinitions.cs" />
+	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\MouseEventReceivedEventArgs.cs" Link="Helpers\MouseEventReceivedEventArgs.cs" />
+	  <Compile Include="..\TrayIconFlyout.Shared\SystemTrayIcon.cs" Link="SystemTrayIcon.cs" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Include="..\TrayIconFlyout.Shared\NativeMethods.json" Link="NativeMethods.json" />
+		<None Include="..\TrayIconFlyout.Shared\NativeMethods.txt" Link="NativeMethods.txt" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\..\.nuget\README.md" Pack="true" PackagePath="" />
