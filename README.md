@@ -1,5 +1,5 @@
 <h1 align="center">Tray Icon Flyout</h1>
-<p align="center">Empower your app with a flyout for its tray icon in WinUI 2/3.</p>
+<p align="center">Empower your app with a flyout for its tray icon in WinUI 2/3 and WPF.</p>
 
 ## Installing the package
 
@@ -17,11 +17,19 @@ You can consume this project via NuGet. Use NuGet Package Manager or run the fol
 > dotnet add package 0x5BFA.TrayIconFlyout.WinUI --prerelease
 ```
 
+### WPF
+
+```
+> dotnet add package 0x5BFA.TrayIconFlyout.Wpf --prerelease
+```
+
 ## Usage
 
 There are two flyouts are available in this project. One is `TrayIconFlyout` for the Shell Flyout behavior, and the other is `TrayIconMenuFlyout` for the Context Menu behavior.
 
-### TrayIconFlyout
+**Note:** `TrayIconMenuFlyout` is currently only available for UWP and WindowsAppSDK platforms.
+
+### TrayIconFlyout (WinUI 2/3)
 
 ```xml
 <me:TrayIconFlyout x:Class="..." ... Width="360">
@@ -43,7 +51,7 @@ else
     _trayIconFlyout.Show();
 ```
 
-### TrayIconMeunFlyout
+### TrayIconMenuFlyout
 
 ```xml
 <me:TrayIconMenuFlyout x:Class="..." ...>
@@ -73,6 +81,35 @@ if (_trayIconMenuFlyout.IsOpen)
     _trayIconMenuFlyout.Hide();
 
 _trayIconMenuFlyout.Show(e.Point);
+```
+
+### TrayIconFlyout (WPF)
+
+```csharp
+// Create and configure the flyout
+var trayIconFlyout = new TrayIconFlyout
+{
+    Width = 360,
+    Height = 300
+};
+
+// Add an island with content
+var island = new TrayIconFlyoutIsland
+{
+    Height = 250,
+    Content = new StackPanel
+    {
+        // Add your WPF controls here
+    }
+};
+
+trayIconFlyout.Islands.Add(island);
+
+// Show/Hide the flyout
+if (trayIconFlyout.IsOpen)
+    trayIconFlyout.Hide();
+else
+    trayIconFlyout.Show();
 ```
 
 ## Building from the source

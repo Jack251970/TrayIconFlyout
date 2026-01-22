@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+	<PropertyGroup>
+
+		<TargetFrameworks>net9.0-windows;net10.0-windows</TargetFrameworks>
+		<Configurations>Debug;Release</Configurations>
+		<Platforms>x86;x64;arm64</Platforms>
+		<RootNamespace>U5BFA.Libraries</RootNamespace>
+		<Nullable>enable</Nullable>
+		<PublishAot>true</PublishAot>
+		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+		<CsWin32RunAsBuildTask>true</CsWin32RunAsBuildTask>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>preview</LangVersion>
+		<NoWarn>$(NoWarn);CS8305</NoWarn>
+		<DefineConstants>$(DefineConstants);WPF</DefineConstants>
+
+		<UseWPF>true</UseWPF>
+
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>0x5BFA.TrayIconFlyout.Wpf</PackageId>
+		<Title>0x5BFA.TrayIconFlyout.Wpf</Title>
+		<Authors>0x5BFA</Authors>
+		<Version>1.0.0-preview3</Version>
+		<Description>Empower your app with a flyout that pops up from a tray icon.</Description>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/0x5bfa/TrayIconFlyout</RepositoryUrl>
+		<PackageTags>Shell System Tray Icon Flyout WPF Windows</PackageTags>
+	
+	</PropertyGroup>
+	
+	<ItemGroup>
+	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\ManualDefinitions.cs" Link="Helpers\ManualDefinitions.cs" />
+	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\MouseEventReceivedEventArgs.cs" Link="Helpers\MouseEventReceivedEventArgs.cs" />
+	  <Compile Include="..\TrayIconFlyout.Shared\SystemTrayIcon.cs" Link="SystemTrayIcon.cs" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <AdditionalFiles Include="..\TrayIconFlyout.Shared\NativeMethods.json" Link="NativeMethods.json" />
+		<AdditionalFiles Include="..\TrayIconFlyout.Shared\NativeMethods.txt" Link="NativeMethods.txt" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\.nuget\README.md" Pack="true" PackagePath="" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.257" PrivateAssets="all" />
+	</ItemGroup>
+
+</Project>

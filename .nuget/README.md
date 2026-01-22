@@ -1,6 +1,6 @@
 ## Usage
 
-### TrayIconFlyout
+### TrayIconFlyout (WinUI 2/3)
 
 ```xml
 <me:TrayIconFlyout x:Class="..." ... Width="360">
@@ -22,7 +22,36 @@ else
     _trayIconFlyout.Show();
 ```
 
-### TrayIconMeunFlyout
+### TrayIconFlyout (WPF)
+
+```csharp
+// Create and configure the flyout
+var trayIconFlyout = new TrayIconFlyout
+{
+    Width = 360,
+    Height = 300
+};
+
+// Add an island with content
+var island = new TrayIconFlyoutIsland
+{
+    Height = 250,
+    Content = new StackPanel
+    {
+        // Add your WPF controls here
+    }
+};
+
+trayIconFlyout.Islands.Add(island);
+
+// Show/Hide the flyout
+if (trayIconFlyout.IsOpen)
+    trayIconFlyout.Hide();
+else
+    trayIconFlyout.Show();
+```
+
+### TrayIconMenuFlyout
 
 ```xml
 <me:TrayIconMenuFlyout x:Class="..." ...>
