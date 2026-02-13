@@ -23,7 +23,8 @@ namespace U5BFA.Libraries
 			TrayIconFlyout = new TrayIconFlyout
             {
                 Width = 360,
-                Height = 300
+                Height = 300,
+                IsTransitionAnimationEnabled = false
             };
 
             var island = new TrayIconFlyoutIsland

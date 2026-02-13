@@ -81,13 +81,13 @@ namespace U5BFA.Libraries
 			UpdateLayout();
 
 			// Ensure to hide first
-			if (RootGrid.RenderTransform is TranslateTransform translateTransform)
+			/*if (RootGrid.RenderTransform is TranslateTransform translateTransform)
 			{
 				if (PopupDirection is Orientation.Vertical)
 					translateTransform.Y = DesiredSize.Height;
 				else
 					translateTransform.X = DesiredSize.Width;
-			}
+			}*/
 
 			_host.Show();
 
