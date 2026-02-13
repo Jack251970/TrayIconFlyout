@@ -21,12 +21,7 @@ namespace U5BFA.Libraries
 
 		internal void Initialize(SystemTrayIcon trayIcon)
 		{
-            TrayIconFlyout = new TrayIconFlyout(new MainTrayIconFlyoutWindow())
-            {
-                Width = 360,
-                Height = 300,
-                IsTransitionAnimationEnabled = false
-            };
+            TrayIconFlyout = new MainTrayIconFlyout();
 
             var island = new TrayIconFlyoutIsland
             {
