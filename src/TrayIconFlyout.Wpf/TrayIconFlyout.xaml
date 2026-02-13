@@ -6,7 +6,7 @@
     <Style x:Key="DefaultWindows11TrayIconFlyoutStyle" TargetType="{x:Type local:TrayIconFlyout}">
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
-        <Setter Property="Margin" Value="12" />
+        <Setter Property="Margin" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="IsTabStop" Value="False" />
