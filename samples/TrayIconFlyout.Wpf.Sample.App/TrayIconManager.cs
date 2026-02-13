@@ -25,41 +25,14 @@ namespace U5BFA.Libraries
 
             var island = new TrayIconFlyoutIsland
             {
-                Content = new StackPanel
+                Content = new Button
                 {
-                    Margin = new Thickness(16),
-                    Children =
-                    {
-                        new TextBlock
-                        {
-                            Text = "TrayIconFlyout for WPF",
-                            FontSize = 20,
-                            FontWeight = FontWeights.Bold,
-                            Margin = new Thickness(0, 0, 0, 16)
-                        },
-                        new TextBlock
-                        {
-                            Text = "This is a flyout that appears from the system tray.",
-                            TextWrapping = TextWrapping.Wrap,
-                            Margin = new Thickness(0, 0, 0, 16)
-                        },
-                        new Button
-                        {
-                            Content = "Close",
-                            HorizontalAlignment = HorizontalAlignment.Center,
-                            Padding = new Thickness(16, 8, 16, 8)
-                        }
-                    }
+                    Content = "Button",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Padding = new Thickness(16, 8, 16, 8)
                 }
             };
-
-            if (island.Content is StackPanel panel)
-            {
-                if (panel.Children[panel.Children.Count - 1] is Button btn)
-                {
-                    btn.Click += (s, e) => TrayIconFlyout?.Hide();
-                }
-            }
 
             TrayIconFlyout.Islands.Add(island);
 
