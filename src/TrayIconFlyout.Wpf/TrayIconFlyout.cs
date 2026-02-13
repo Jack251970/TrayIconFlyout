@@ -66,13 +66,13 @@ namespace U5BFA.Libraries
 			if (_host is null || _isPopupAnimationPlaying)
 				return;
 
-			_isPopupAnimationPlaying = true;
+            // Ensure template is applied before accessing template parts
+            ApplyTemplate();
 
-			// Ensure template is applied before accessing template parts
-			ApplyTemplate();
-			
-			if (RootGrid is null)
-				return;
+            if (RootGrid is null)
+                throw new InvalidOperationException($"Template part {PART_RootGrid} is missing. Ensure the control template is correctly defined.");
+
+            _isPopupAnimationPlaying = true;
 
 			// Position the window near the system tray
 			PositionWindow();
