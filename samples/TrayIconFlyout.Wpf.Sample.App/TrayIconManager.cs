@@ -21,7 +21,7 @@ namespace U5BFA.Libraries
 
 		internal void Initialize(SystemTrayIcon trayIcon)
 		{
-			TrayIconFlyout = new TrayIconFlyout
+            TrayIconFlyout = new TrayIconFlyout(new TrayIconFlyoutWindow())
             {
                 Width = 360,
                 Height = 300,
