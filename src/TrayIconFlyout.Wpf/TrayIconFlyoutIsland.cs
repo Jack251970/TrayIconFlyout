@@ -12,7 +12,7 @@ namespace U5BFA.Libraries
 	/// </summary>
 	public partial class TrayIconFlyoutIsland : ContentControl
 	{
-		private const string PART_RootGrid = "PART_RootGrid";
+        private const string PART_RootGrid = "PART_RootGrid";
 		private const string PART_MainContentPresenter = "PART_MainContentPresenter";
 
 		private Grid? RootGrid;
@@ -20,7 +20,12 @@ namespace U5BFA.Libraries
 
 		private WeakReference<TrayIconFlyout>? _owner;
 
-		public TrayIconFlyoutIsland()
+        static TrayIconFlyoutIsland()
+        {
+            ContentProperty.OverrideMetadata(typeof(TrayIconFlyoutIsland), new FrameworkPropertyMetadata(OnContentChanged));
+        }
+
+        public TrayIconFlyoutIsland()
 		{
 			DefaultStyleKey = typeof(TrayIconFlyoutIsland);
 		}
@@ -33,8 +38,6 @@ namespace U5BFA.Libraries
 				?? throw new InvalidOperationException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
 			MainContentPresenter = GetTemplateChild(PART_MainContentPresenter) as ContentPresenter
 				?? throw new InvalidOperationException($"Could not find {PART_MainContentPresenter} in the given {nameof(TrayIconFlyoutIsland)}'s style.");
-
-			Unloaded += TrayIconFlyoutIsland_Unloaded;
 		}
 
 		internal void SetOwner(TrayIconFlyout owner)
@@ -42,9 +45,34 @@ namespace U5BFA.Libraries
 			_owner = new(owner);
 		}
 
-		private void TrayIconFlyoutIsland_Unloaded(object sender, RoutedEventArgs e)
+		private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
-			Unloaded -= TrayIconFlyoutIsland_Unloaded;
+			if (d is TrayIconFlyoutIsland island)
+				island.HandleContentChanged(e.OldValue, e.NewValue);
 		}
-	}
+
+		private void HandleContentChanged(object? oldValue, object? newValue)
+		{
+			if (newValue is not FrameworkElement newContent || MainContentPresenter is null)
+				return;
+
+            MainContentPresenter.Content = newContent;
+        }
+
+		/// <summary>
+		/// Identifies the <see cref="CornerRadius"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty CornerRadiusProperty =
+            DependencyProperty.Register(
+                nameof(CornerRadius),
+                typeof(CornerRadius),
+                typeof(TrayIconFlyoutIsland),
+                new PropertyMetadata(new CornerRadius(0)));
+
+        public CornerRadius CornerRadius
+        {
+            get => (CornerRadius)GetValue(CornerRadiusProperty);
+            set => SetValue(CornerRadiusProperty, value);
+        }
+    }
 }
