@@ -64,10 +64,16 @@ namespace U5BFA.Libraries
 
 		public void Show()
 		{
-			if (_host is null || RootGrid is null || _isPopupAnimationPlaying)
+			if (_host is null || _isPopupAnimationPlaying)
 				return;
 
 			_isPopupAnimationPlaying = true;
+
+			// Ensure template is applied before accessing template parts
+			ApplyTemplate();
+			
+			if (RootGrid is null)
+				return;
 
 			// Position the window near the system tray
 			PositionWindow();
