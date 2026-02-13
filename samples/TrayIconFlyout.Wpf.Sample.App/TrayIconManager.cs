@@ -23,18 +23,17 @@ namespace U5BFA.Libraries
 		{
             TrayIconFlyout = new MainTrayIconFlyout();
 
-            var island = new TrayIconFlyoutIsland
+            // Here is an example of how to add an island to the flyout with codes. You can also add islands in XAML.
+            /*var island = new TrayIconFlyoutIsland
             {
                 Content = new Button
                 {
                     Content = "Button",
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Padding = new Thickness(16, 8, 16, 8)
+                    VerticalAlignment = VerticalAlignment.Center
                 }
             };
-
-            TrayIconFlyout.Islands.Add(island);
+            TrayIconFlyout.Islands.Add(island);*/
 
             SystemTrayIcon = trayIcon;
 			SystemTrayIcon.Show();
