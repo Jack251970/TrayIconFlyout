@@ -3,6 +3,7 @@
 
 using System;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace U5BFA.Libraries
 {
@@ -30,25 +31,25 @@ namespace U5BFA.Libraries
             var island = new TrayIconFlyoutIsland
             {
                 Height = 250,
-                Content = new System.Windows.Controls.StackPanel
+                Content = new StackPanel
                 {
                     Margin = new Thickness(16),
                     Children =
                     {
-                        new System.Windows.Controls.TextBlock
+                        new TextBlock
                         {
                             Text = "TrayIconFlyout for WPF",
                             FontSize = 20,
                             FontWeight = FontWeights.Bold,
                             Margin = new Thickness(0, 0, 0, 16)
                         },
-                        new System.Windows.Controls.TextBlock
+                        new TextBlock
                         {
                             Text = "This is a flyout that appears from the system tray.",
                             TextWrapping = TextWrapping.Wrap,
                             Margin = new Thickness(0, 0, 0, 16)
                         },
-                        new System.Windows.Controls.Button
+                        new Button
                         {
                             Content = "Close",
                             HorizontalAlignment = HorizontalAlignment.Center,
@@ -58,9 +59,9 @@ namespace U5BFA.Libraries
                 }
             };
 
-            if (island.Content is System.Windows.Controls.StackPanel panel)
+            if (island.Content is StackPanel panel)
             {
-                if (panel.Children[panel.Children.Count - 1] is System.Windows.Controls.Button btn)
+                if (panel.Children[panel.Children.Count - 1] is Button btn)
                 {
                     btn.Click += (s, e) => TrayIconFlyout?.Hide();
                 }
