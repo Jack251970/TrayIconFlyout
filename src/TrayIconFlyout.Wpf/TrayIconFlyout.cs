@@ -28,27 +28,26 @@ namespace U5BFA.Libraries
 
 		public bool IsOpen { get; private set; }
 
-		public TrayIconFlyout()
+		public TrayIconFlyout() : this(new Window
+        {
+            WindowStyle = WindowStyle.None,
+            ResizeMode = ResizeMode.NoResize,
+            ShowInTaskbar = false,
+            Topmost = true,
+            AllowsTransparency = true,
+            Background = Brushes.Transparent
+        })
 		{
-			DefaultStyleKey = typeof(TrayIconFlyout);
-			InitializeHostWindow();
+
 		}
 
-		private void InitializeHostWindow()
-		{
-			_host = new Window
-			{
-				WindowStyle = WindowStyle.None,
-				ResizeMode = ResizeMode.NoResize,
-				ShowInTaskbar = false,
-				Topmost = true,
-				AllowsTransparency = true,
-				Background = Brushes.Transparent,
-				Content = this
-			};
-
-			_host.Deactivated += HostWindow_Deactivated;
-		}
+        public TrayIconFlyout(Window host)
+        {
+            DefaultStyleKey = typeof(TrayIconFlyout);
+            _host = host;
+			_host.Content = this;
+            host.Deactivated += HostWindow_Deactivated;
+        }
 
 		public override void OnApplyTemplate()
 		{
