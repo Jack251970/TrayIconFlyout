@@ -10,4 +10,13 @@
     d:DesignHeight="300"
     d:DesignWidth="360"
     IsTransitionAnimationEnabled="False"
-    mc:Ignorable="d" />
+    mc:Ignorable="d">
+
+    <local:TrayIconFlyoutIsland>
+        <Button
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Content="Button" />
+    </local:TrayIconFlyoutIsland>
+
+</local:TrayIconFlyout>
