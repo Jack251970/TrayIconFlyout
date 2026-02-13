@@ -30,7 +30,6 @@ namespace U5BFA.Libraries
 
             var island = new TrayIconFlyoutIsland
             {
-                Height = 250,
                 Content = new StackPanel
                 {
                     Margin = new Thickness(16),
