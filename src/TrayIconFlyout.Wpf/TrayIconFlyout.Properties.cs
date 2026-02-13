@@ -10,8 +10,7 @@ namespace U5BFA.Libraries
 {
 	public partial class TrayIconFlyout
 	{
-		private readonly ObservableCollection<TrayIconFlyoutIsland> _islands = [];
-		public IList<TrayIconFlyoutIsland> Islands => _islands;
+		public ObservableCollection<TrayIconFlyoutIsland> Islands { get; set; } = [];
 
 		public static readonly DependencyProperty IslandsSourceProperty =
 			DependencyProperty.Register(nameof(IslandsSource), typeof(object), typeof(TrayIconFlyout),
