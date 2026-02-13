@@ -2,9 +2,9 @@
 
 namespace U5BFA.Libraries;
 
-public partial class TrayIconFlyoutWindow : Window
+public partial class MainTrayIconFlyoutWindow : Window
 {
-    public TrayIconFlyoutWindow()
+    public MainTrayIconFlyoutWindow()
     {
         InitializeComponent();
     }
