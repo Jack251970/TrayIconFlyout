@@ -32,7 +32,7 @@
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="BorderBrush" Value="#40FFFFFF" />
-        <Setter Property="Background" Value="#F0F0F0" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
