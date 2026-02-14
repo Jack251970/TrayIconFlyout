@@ -33,7 +33,7 @@
         <Setter Property="CornerRadius" Value="12" />
         <Setter Property="Background" Value="Gray" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="Red" />
+        <Setter Property="BorderBrush" Value="#66757575" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
