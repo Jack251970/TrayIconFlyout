@@ -6,17 +6,21 @@
     xmlns:local="clr-namespace:U5BFA.Libraries;assembly=TrayIconFlyout.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Width="360"
-    Height="300"
-    d:DesignHeight="300"
-    d:DesignWidth="360"
+    Height="600"
     IsTransitionAnimationEnabled="False"
     mc:Ignorable="d">
 
-    <local:TrayIconFlyoutIsland>
+    <local:TrayIconFlyoutIsland Height="300">
         <Button
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            Content="Button" />
+            Content="Button 1" />
+    </local:TrayIconFlyoutIsland>
+    <local:TrayIconFlyoutIsland Height="300">
+        <Button
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Content="Button 2" />
     </local:TrayIconFlyoutIsland>
 
 </local:TrayIconFlyout>
