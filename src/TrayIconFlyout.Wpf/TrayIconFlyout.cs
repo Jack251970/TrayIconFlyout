@@ -164,32 +164,38 @@ namespace U5BFA.Libraries
 
 			if (IslandsOrientation is Orientation.Vertical)
 			{
-				for (int index = 0; index < Islands.Count; index++)
+				for (var index = 0; index < Islands.Count; index++)
 				{
 					if (Islands[index] is not TrayIconFlyoutIsland island)
 						continue;
 
 					IslandsGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-					Grid.SetRow(island, index);
+					Grid.SetRow(island, index * 2);
 					Grid.SetColumn(island, 0);
 					island.SetOwner(this);
                     IslandsGrid.Children.Add(island);
+
+					if (index != Islands.Count - 1)
+						IslandsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(12) });
 				}
-			}
+            }
 			else
 			{
-				for (int index = 0; index < Islands.Count; index++)
+				for (var index = 0; index < Islands.Count; index++)
 				{
 					if (Islands[index] is not TrayIconFlyoutIsland island)
 						continue;
 
 					IslandsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 					Grid.SetRow(island, 0);
-					Grid.SetColumn(island, index);
+					Grid.SetColumn(island, index * 2);
 					island.SetOwner(this);
                     IslandsGrid.Children.Add(island);
-				}
-			}
+
+					if (index != Islands.Count - 1)
+						IslandsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(12) });
+                }
+            }
 		}
 
 		private Storyboard GetBottomToTopTransitionStoryboard(FrameworkElement target, int from, int to)

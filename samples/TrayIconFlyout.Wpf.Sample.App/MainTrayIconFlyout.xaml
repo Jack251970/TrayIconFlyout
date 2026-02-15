@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:U5BFA.Libraries;assembly=TrayIconFlyout.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Width="360"
-    Height="600"
+    Height="612"
     IsTransitionAnimationEnabled="False"
     mc:Ignorable="d">
 
