@@ -188,17 +188,41 @@ namespace U5BFA.Libraries
             }
 		}
 
+		private TranslateTransform EnsureTranslateTransform()
+		{
+			if (RootGrid is null)
+				throw new InvalidOperationException("RootGrid is null");
+
+			if (RootGrid.RenderTransform is not TranslateTransform translateTransform)
+			{
+				translateTransform = new TranslateTransform();
+				RootGrid.RenderTransform = translateTransform;
+			}
+
+			return translateTransform;
+		}
+
+		private void ResetInactiveAxis(TranslateTransform translateTransform, Orientation direction)
+		{
+			if (direction is Orientation.Vertical)
+			{
+				translateTransform.BeginAnimation(TranslateTransform.XProperty, null);
+				translateTransform.X = 0;
+			}
+			else
+			{
+				translateTransform.BeginAnimation(TranslateTransform.YProperty, null);
+				translateTransform.Y = 0;
+			}
+		}
+
 		private void AnimateShow()
 		{
 			if (RootGrid is null)
 				return;
 
 			// Ensure RenderTransform is set
-			if (RootGrid.RenderTransform is not TranslateTransform translateTransform)
-			{
-				translateTransform = new TranslateTransform();
-				RootGrid.RenderTransform = translateTransform;
-			}
+			var translateTransform = EnsureTranslateTransform();
 
 			// Get animation parameters based on popup direction
 			var (animationProperty, fromValue, toValue, duration) = PopupDirection switch
@@ -218,16 +242,7 @@ namespace U5BFA.Libraries
 			};
 
 			// Reset the other axis
-			if (PopupDirection is Orientation.Vertical)
-			{
-				translateTransform.BeginAnimation(TranslateTransform.XProperty, null);
-				translateTransform.X = 0;
-			}
-			else
-			{
-				translateTransform.BeginAnimation(TranslateTransform.YProperty, null);
-				translateTransform.Y = 0;
-			}
+			ResetInactiveAxis(translateTransform, PopupDirection);
 
 			// Create the keyframe animation
 			var keyFrames = new DoubleAnimationUsingKeyFrames
@@ -269,11 +284,7 @@ namespace U5BFA.Libraries
 				return;
 
 			// Ensure RenderTransform is set
-			if (RootGrid.RenderTransform is not TranslateTransform translateTransform)
-			{
-				translateTransform = new TranslateTransform();
-				RootGrid.RenderTransform = translateTransform;
-			}
+			var translateTransform = EnsureTranslateTransform();
 
 			// Get animation parameters based on popup direction
 			var (animationProperty, fromValue, toValue, duration) = PopupDirection switch
@@ -293,16 +304,7 @@ namespace U5BFA.Libraries
 			};
 
 			// Reset the other axis
-			if (PopupDirection is Orientation.Vertical)
-			{
-				translateTransform.BeginAnimation(TranslateTransform.XProperty, null);
-				translateTransform.X = 0;
-			}
-			else
-			{
-				translateTransform.BeginAnimation(TranslateTransform.YProperty, null);
-				translateTransform.Y = 0;
-			}
+			ResetInactiveAxis(translateTransform, PopupDirection);
 
 			// Create the keyframe animation for translate transform
 			var translateKeyFrames = new DoubleAnimationUsingKeyFrames
