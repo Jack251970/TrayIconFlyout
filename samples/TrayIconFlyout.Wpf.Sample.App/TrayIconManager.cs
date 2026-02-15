@@ -39,7 +39,7 @@ namespace U5BFA.Libraries
 		private void SystemTrayIcon_RightClicked(object? sender, MouseEventReceivedEventArgs e)
 		{
             if (TrayIconFlyout is null)
-				return;
+                return;
 
             if (TrayIconFlyout.IsOpen)
                 TrayIconFlyout.Hide();
@@ -49,9 +49,10 @@ namespace U5BFA.Libraries
 
         public void Dispose()
 		{
-			SystemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
+            SystemTrayIcon?.Hide();
+            SystemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
 			SystemTrayIcon?.RightClicked -= SystemTrayIcon_RightClicked;
-			SystemTrayIcon?.Destroy();
+			SystemTrayIcon?.Dispose();
 			TrayIconFlyout?.Dispose();
 		}
 	}

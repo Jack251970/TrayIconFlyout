@@ -2,7 +2,7 @@
 	
 	<PropertyGroup>
 
-		<TargetFrameworks>net9.0-windows;net10.0-windows</TargetFrameworks>
+		<TargetFrameworks>net10.0-windows</TargetFrameworks>
 		<Configurations>Debug;Release</Configurations>
 		<Platforms>x86;x64;arm64</Platforms>
 		<RootNamespace>U5BFA.Libraries</RootNamespace>
@@ -13,7 +13,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
 		<NoWarn>$(NoWarn);CS8305</NoWarn>
-		<DefineConstants>$(DefineConstants);WPF</DefineConstants>
+		<DefineConstants>$(DefineConstants)</DefineConstants>
 
 		<UseWPF>true</UseWPF>
 
@@ -31,20 +31,13 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\GeneralHelpers.cs" Link="GeneralHelpers.cs" />
-	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\ManualDefinitions.cs" Link="Helpers\ManualDefinitions.cs" />
-	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\MouseEventReceivedEventArgs.cs" Link="Helpers\MouseEventReceivedEventArgs.cs" />
-	  <Compile Include="..\TrayIconFlyout.Shared\SystemTrayIcon.cs" Link="SystemTrayIcon.cs" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <AdditionalFiles Include="..\TrayIconFlyout.Shared\NativeMethods.json" Link="NativeMethods.json" />
-		<AdditionalFiles Include="..\TrayIconFlyout.Shared\NativeMethods.txt" Link="NativeMethods.txt" />
+	  <AdditionalFiles Include="NativeMethods.json" />
+	  <AdditionalFiles Include="NativeMethods.txt" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\.nuget\README.md" Pack="true" PackagePath="" />
-		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+		<None Include="README.md" Pack="true" PackagePath="" />
+		<None Include="LICENSE" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 	<ItemGroup>
