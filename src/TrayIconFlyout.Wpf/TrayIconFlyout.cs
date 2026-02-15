@@ -19,6 +19,9 @@ namespace U5BFA.Libraries
 		private const string PART_RootGrid = "PART_RootGrid";
 		private const string PART_IslandsGrid = "PART_IslandsGrid";
 
+		private static readonly KeySpline OpenAnimationKeySpline = new(0.1, 0.9, 0.4, 1.0);
+		private static readonly KeySpline CloseAnimationKeySpline = new(0.2, 0.0, 0.9, 0.0);
+
 		private Window? _host;
 		private bool _isPopupAnimationPlaying;
 		private Grid? RootGrid;
@@ -242,7 +245,7 @@ namespace U5BFA.Libraries
 			// Add spline keyframe for smooth animation
 			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame
 			{
-				KeySpline = new KeySpline(0.1, 0.9, 0.4, 1.0),
+				KeySpline = OpenAnimationKeySpline,
 				KeyTime = duration,
 				Value = toValue
 			});
@@ -317,7 +320,7 @@ namespace U5BFA.Libraries
 			// Add spline keyframe for smooth animation
 			translateKeyFrames.KeyFrames.Add(new SplineDoubleKeyFrame
 			{
-				KeySpline = new KeySpline(0.2, 0, 0.9, 0),
+				KeySpline = CloseAnimationKeySpline,
 				KeyTime = duration,
 				Value = toValue
 			});
