@@ -2,8 +2,6 @@
 // Licensed under the MIT license.
 
 using System;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace U5BFA.Libraries
 {
@@ -14,26 +12,12 @@ namespace U5BFA.Libraries
 
 		internal SystemTrayIcon? SystemTrayIcon { get; set; }
 		internal TrayIconFlyout? TrayIconFlyout { get; set; }
-        // TODO
-        /*internal TrayIconMenuFlyout? TrayIconMenuFlyout { get; set; }*/
 
         private TrayIconManager() { }
 
 		internal void Initialize(SystemTrayIcon trayIcon)
 		{
             TrayIconFlyout = new MainTrayIconFlyout();
-
-            // Here is an example of how to add an island to the flyout with codes. You can also add islands in XAML.
-            /*var island = new TrayIconFlyoutIsland
-            {
-                Content = new Button
-                {
-                    Content = "Button",
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            };
-            TrayIconFlyout.Islands.Add(island);*/
 
             SystemTrayIcon = trayIcon;
 			SystemTrayIcon.Show();
@@ -54,14 +38,13 @@ namespace U5BFA.Libraries
 
 		private void SystemTrayIcon_RightClicked(object? sender, MouseEventReceivedEventArgs e)
 		{
-            // TODO
-            /*if (TrayIconMenuFlyout is null)
+            if (TrayIconFlyout is null)
 				return;
 
-			if (TrayIconMenuFlyout.IsOpen)
-				TrayIconMenuFlyout.Hide();
-
-			TrayIconMenuFlyout.Show(new(e.Point.X, e.Point.Y - 32));*/
+            if (TrayIconFlyout.IsOpen)
+                TrayIconFlyout.Hide();
+            else
+                TrayIconFlyout.Show();
         }
 
         public void Dispose()
