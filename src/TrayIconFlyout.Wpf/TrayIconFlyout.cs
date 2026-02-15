@@ -56,7 +56,10 @@ namespace U5BFA.Libraries
 			IslandsGrid = GetTemplateChild(PART_IslandsGrid) as Grid
 				?? throw new InvalidOperationException($"Could not find {PART_IslandsGrid} in the given {nameof(TrayIconFlyout)}'s style.");
 
-			UpdateIslands();
+			// Ensure the render transform is mutable
+			RootGrid.RenderTransform = new TranslateTransform();
+
+            UpdateIslands();
 		}
 
 		public void Show()
@@ -72,22 +75,36 @@ namespace U5BFA.Libraries
 
             _isPopupAnimationPlaying = true;
 
+            // Ensure the layout is updated to get the correct DesiredSize for animation
+            Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
             UpdateLayout();
 
             UpdateBackdrop();
 
             UpdateFlyoutRegion();
 
+            // Ensure to hide first
+            if (RootGrid.RenderTransform is TranslateTransform translateTransform)
+            {
+                if (PopupDirection is Orientation.Vertical)
+                    translateTransform.Y = DesiredSize.Height;
+                else
+                    translateTransform.X = DesiredSize.Width;
+            }
+
             UpdateLayout();
 
             _host.Show();
 
-			RootGrid.Visibility = Visibility.Visible;
-
             if (IsTransitionAnimationEnabled)
 			{
-				// TODO
-			}
+                var storyboard = PopupDirection is Orientation.Vertical
+                    ? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, (int)DesiredSize.Height, 0)
+                    : TransitionHelpers.GetWindows11RightToLeftTransitionStoryboard(RootGrid, (int)DesiredSize.Width, 0);
+                storyboard.Begin();
+                storyboard.Completed += OpenAnimationStoryboard_Completed;
+            }
 			else
 			{
 				IsOpen = true;
@@ -102,12 +119,14 @@ namespace U5BFA.Libraries
 
 			_isPopupAnimationPlaying = true;
 
-			RootGrid.Visibility = Visibility.Visible;
-
             if (IsTransitionAnimationEnabled)
 			{
-				// TODO
-			}
+                var storyboard = PopupDirection is Orientation.Vertical
+                    ? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, (int)DesiredSize.Height)
+                    : TransitionHelpers.GetWindows11LeftToRightTransitionStoryboard(RootGrid, 0, (int)DesiredSize.Width);
+                storyboard.Begin();
+                storyboard.Completed += CloseAnimationStoryboard_Completed;
+            }
 			else
 			{
 				_host.Hide();
@@ -185,7 +204,7 @@ namespace U5BFA.Libraries
             }
 		}
 
-		private void OpenAnimationStoryboard_Completed(object? sender, EventArgs e)
+        private void OpenAnimationStoryboard_Completed(object? sender, object e)
 		{
 			if (sender is not Storyboard storyboard)
 				return;
@@ -195,7 +214,7 @@ namespace U5BFA.Libraries
 			IsOpen = true;
 		}
 
-		private void CloseAnimationStoryboard_Completed(object? sender, EventArgs e)
+		private void CloseAnimationStoryboard_Completed(object? sender, object e)
 		{
 			if (sender is not Storyboard storyboard)
 				return;
