@@ -242,7 +242,7 @@ namespace U5BFA.Libraries
 			// Add spline keyframe for smooth animation
 			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame
 			{
-				KeySpline = new KeySpline(0, 0, 0, 1),
+				KeySpline = new KeySpline(0.1, 0.9, 0.4, 1.0),
 				KeyTime = duration,
 				Value = toValue
 			});
