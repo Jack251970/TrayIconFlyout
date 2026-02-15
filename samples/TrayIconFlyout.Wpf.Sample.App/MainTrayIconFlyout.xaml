@@ -7,7 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Width="360"
     Height="612"
-    IsTransitionAnimationEnabled="False"
     mc:Ignorable="d">
 
     <local:TrayIconFlyoutIsland Height="300">
