@@ -20,7 +20,7 @@
 		<PackageId>0x5BFA.TrayIconFlyout.Wpf</PackageId>
 		<Title>0x5BFA.TrayIconFlyout.Wpf</Title>
 		<Authors>0x5BFA</Authors>
-		<Version>1.0.0-preview3</Version>
+		<Version>0.0.1</Version>
 		<Description>Empower your app with a flyout that pops up from a tray icon.</Description>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
