@@ -86,7 +86,7 @@ namespace U5BFA.Libraries
 
             if (IsTransitionAnimationEnabled)
 			{
-				// TODO
+				AnimateShow();
 			}
 			else
 			{
@@ -106,7 +106,7 @@ namespace U5BFA.Libraries
 
             if (IsTransitionAnimationEnabled)
 			{
-				// TODO
+				AnimateHide();
 			}
 			else
 			{
@@ -183,6 +183,169 @@ namespace U5BFA.Libraries
 						IslandsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(12) });
                 }
             }
+		}
+
+		private void AnimateShow()
+		{
+			if (RootGrid is null)
+				return;
+
+			// Ensure RenderTransform is set
+			if (RootGrid.RenderTransform is not TranslateTransform translateTransform)
+			{
+				translateTransform = new TranslateTransform();
+				RootGrid.RenderTransform = translateTransform;
+			}
+
+			// Get animation parameters based on popup direction
+			var (animationProperty, fromValue, toValue, duration) = PopupDirection switch
+			{
+				Orientation.Vertical => (
+					TranslateTransform.YProperty,
+					ActualHeight,
+					0.0,
+					TimeSpan.FromMilliseconds(267)
+				),
+				_ => (
+					TranslateTransform.XProperty,
+					ActualWidth,
+					0.0,
+					TimeSpan.FromMilliseconds(167)
+				)
+			};
+
+			// Reset the other axis
+			if (PopupDirection is Orientation.Vertical)
+			{
+				translateTransform.BeginAnimation(TranslateTransform.XProperty, null);
+				translateTransform.X = 0;
+			}
+			else
+			{
+				translateTransform.BeginAnimation(TranslateTransform.YProperty, null);
+				translateTransform.Y = 0;
+			}
+
+			// Create the keyframe animation
+			var keyFrames = new DoubleAnimationUsingKeyFrames
+			{
+				Duration = duration
+			};
+
+			// Add discrete keyframe for initial position
+			keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame
+			{
+				KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero),
+				Value = fromValue
+			});
+
+			// Add spline keyframe for smooth animation
+			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame
+			{
+				KeySpline = new KeySpline(0, 0, 0, 1),
+				KeyTime = duration,
+				Value = toValue
+			});
+
+			// Create and configure the storyboard
+			var storyboard = new Storyboard();
+			Storyboard.SetTarget(keyFrames, translateTransform);
+			Storyboard.SetTargetProperty(keyFrames, new PropertyPath(animationProperty));
+			storyboard.Children.Add(keyFrames);
+
+			// Subscribe to completion event
+			storyboard.Completed += OpenAnimationStoryboard_Completed;
+
+			// Start the animation
+			storyboard.Begin();
+		}
+
+		private void AnimateHide()
+		{
+			if (RootGrid is null)
+				return;
+
+			// Ensure RenderTransform is set
+			if (RootGrid.RenderTransform is not TranslateTransform translateTransform)
+			{
+				translateTransform = new TranslateTransform();
+				RootGrid.RenderTransform = translateTransform;
+			}
+
+			// Get animation parameters based on popup direction
+			var (animationProperty, fromValue, toValue, duration) = PopupDirection switch
+			{
+				Orientation.Vertical => (
+					TranslateTransform.YProperty,
+					0.0,
+					ActualHeight,
+					TimeSpan.FromMilliseconds(200)
+				),
+				_ => (
+					TranslateTransform.XProperty,
+					0.0,
+					ActualWidth,
+					TimeSpan.FromMilliseconds(167)
+				)
+			};
+
+			// Reset the other axis
+			if (PopupDirection is Orientation.Vertical)
+			{
+				translateTransform.BeginAnimation(TranslateTransform.XProperty, null);
+				translateTransform.X = 0;
+			}
+			else
+			{
+				translateTransform.BeginAnimation(TranslateTransform.YProperty, null);
+				translateTransform.Y = 0;
+			}
+
+			// Create the keyframe animation for translate transform
+			var translateKeyFrames = new DoubleAnimationUsingKeyFrames
+			{
+				Duration = duration
+			};
+
+			// Add discrete keyframe for initial position
+			translateKeyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame
+			{
+				KeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero),
+				Value = fromValue
+			});
+
+			// Add spline keyframe for smooth animation
+			translateKeyFrames.KeyFrames.Add(new SplineDoubleKeyFrame
+			{
+				KeySpline = new KeySpline(0.2, 0, 0.9, 0),
+				KeyTime = duration,
+				Value = toValue
+			});
+
+			// Create visibility animation to collapse at the end
+			var visibilityAnimation = new ObjectAnimationUsingKeyFrames();
+			visibilityAnimation.KeyFrames.Add(new DiscreteObjectKeyFrame
+			{
+				KeyTime = duration,
+				Value = Visibility.Collapsed
+			});
+
+			// Create and configure the storyboard
+			var storyboard = new Storyboard();
+			
+			Storyboard.SetTarget(translateKeyFrames, translateTransform);
+			Storyboard.SetTargetProperty(translateKeyFrames, new PropertyPath(animationProperty));
+			storyboard.Children.Add(translateKeyFrames);
+
+			Storyboard.SetTarget(visibilityAnimation, RootGrid);
+			Storyboard.SetTargetProperty(visibilityAnimation, new PropertyPath(UIElement.VisibilityProperty));
+			storyboard.Children.Add(visibilityAnimation);
+
+			// Subscribe to completion event
+			storyboard.Completed += CloseAnimationStoryboard_Completed;
+
+			// Start the animation
+			storyboard.Begin();
 		}
 
 		private void OpenAnimationStoryboard_Completed(object? sender, EventArgs e)
