@@ -191,7 +191,7 @@ namespace U5BFA.Libraries
 		private TranslateTransform EnsureTranslateTransform()
 		{
 			if (RootGrid is null)
-				throw new InvalidOperationException("RootGrid is null");
+				throw new InvalidOperationException($"{nameof(RootGrid)} is null");
 
 			if (RootGrid.RenderTransform is not TranslateTransform translateTransform)
 			{
