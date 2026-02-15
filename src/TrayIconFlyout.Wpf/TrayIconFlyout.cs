@@ -145,10 +145,10 @@ namespace U5BFA.Libraries
 			var workingArea = SystemParameters.WorkArea;
 
 			// Position at bottom-right corner (near system tray)
-			_host.Left = workingArea.Right - Width;
-			_host.Top = workingArea.Bottom - Height;
-			_host.Width = Width;
-			_host.Height = Height;
+			_host.Left = workingArea.Right - DesiredSize.Width;
+			_host.Top = workingArea.Bottom - DesiredSize.Height;
+			_host.Width = DesiredSize.Width;
+			_host.Height = DesiredSize.Height;
 		}
 
         private void UpdateBackdrop()
