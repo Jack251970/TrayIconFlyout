@@ -4,9 +4,9 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Markup;
 
 namespace U5BFA.Libraries
 {
@@ -19,13 +19,13 @@ namespace U5BFA.Libraries
 		private const string PART_RootGrid = "PART_RootGrid";
 		private const string PART_IslandsGrid = "PART_IslandsGrid";
 
-		private Grid? RootGrid;
-		private Grid? IslandsGrid;
+        private Grid? RootGrid;
+        private Grid? IslandsGrid;
 
         private Window? _host;
 		private bool _isPopupAnimationPlaying;
 
-		public bool IsOpen { get; private set; }
+        public bool IsOpen { get; private set; }
 
 		public TrayIconFlyout() : this(new Window
         {
@@ -100,11 +100,11 @@ namespace U5BFA.Libraries
 
             if (IsTransitionAnimationEnabled)
 			{
-                var storyboard = PopupDirection is Orientation.Vertical
+				var storyboard = PopupDirection is Orientation.Vertical
                     ? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, (int)DesiredSize.Height, 0)
                     : TransitionHelpers.GetWindows11RightToLeftTransitionStoryboard(RootGrid, (int)DesiredSize.Width, 0);
-                storyboard.Begin();
                 storyboard.Completed += OpenAnimationStoryboard_Completed;
+                storyboard.Begin();
             }
 			else
 			{
@@ -122,11 +122,11 @@ namespace U5BFA.Libraries
 
             if (IsTransitionAnimationEnabled)
 			{
-                var storyboard = PopupDirection is Orientation.Vertical
+				var storyboard = PopupDirection is Orientation.Vertical
                     ? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, (int)DesiredSize.Height)
                     : TransitionHelpers.GetWindows11LeftToRightTransitionStoryboard(RootGrid, 0, (int)DesiredSize.Width);
-                storyboard.Begin();
                 storyboard.Completed += CloseAnimationStoryboard_Completed;
+                storyboard.Begin();
             }
 			else
 			{
@@ -207,24 +207,28 @@ namespace U5BFA.Libraries
 
         private void OpenAnimationStoryboard_Completed(object? sender, object e)
 		{
-			if (sender is not Storyboard storyboard)
-				return;
+            if (sender is not Clock clock || clock.Timeline is not Storyboard storyboard)
+                return;
 
-			storyboard.Completed -= OpenAnimationStoryboard_Completed;
+            if (!storyboard.IsFrozen)
+                storyboard.Completed -= OpenAnimationStoryboard_Completed;
+
 			_isPopupAnimationPlaying = false;
 			IsOpen = true;
-		}
+        }
 
 		private void CloseAnimationStoryboard_Completed(object? sender, object e)
 		{
-			if (sender is not Storyboard storyboard)
-				return;
+            if (sender is not Clock clock || clock.Timeline is not Storyboard storyboard)
+                return;
 
-			storyboard.Completed -= CloseAnimationStoryboard_Completed;
+            if (!storyboard.IsFrozen)
+                storyboard.Completed -= CloseAnimationStoryboard_Completed;
+
 			_isPopupAnimationPlaying = false;
 			IsOpen = false;
 			_host?.Hide();
-		}
+        }
 
 		private void HostWindow_Deactivated(object? sender, EventArgs e)
 		{
