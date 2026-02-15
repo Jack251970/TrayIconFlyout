@@ -72,13 +72,14 @@ namespace U5BFA.Libraries
 
             _isPopupAnimationPlaying = true;
 
-			// Position the window near the system tray
-			PositionWindow();
+            UpdateLayout();
 
-			UpdateLayout();
+            UpdateBackdrop();
 
-			// Ensure to hide first
-			/*if (RootGrid.RenderTransform is TranslateTransform translateTransform)
+            UpdateFlyoutRegion();
+
+            // Ensure to hide first
+            /*if (RootGrid.RenderTransform is TranslateTransform translateTransform)
 			{
 				if (PopupDirection is Orientation.Vertical)
 					translateTransform.Y = DesiredSize.Height;
@@ -86,7 +87,9 @@ namespace U5BFA.Libraries
 					translateTransform.X = DesiredSize.Width;
 			}*/
 
-			_host.Show();
+            UpdateLayout();
+
+            _host.Show();
 
 			if (IsTransitionAnimationEnabled)
 			{
@@ -126,7 +129,7 @@ namespace U5BFA.Libraries
 			}
 		}
 
-		private void PositionWindow()
+		private void UpdateFlyoutRegion()
 		{
 			if (_host is null)
 				return;
@@ -141,7 +144,16 @@ namespace U5BFA.Libraries
 			_host.Height = Height;
 		}
 
-		private void UpdateIslands()
+        private void UpdateBackdrop()
+        {
+            var isLightTheme = GeneralHelpers.IsTaskbarLight();
+            var isColorEnabled = GeneralHelpers.IsTaskbarColorPrevalenceEnabled();
+
+            foreach (var island in Islands)
+                island.UpdateBackdrop(isLightTheme, isColorEnabled);
+        }
+
+        private void UpdateIslands()
 		{
 			if (IslandsGrid is null)
 				return;
@@ -161,7 +173,7 @@ namespace U5BFA.Libraries
 					Grid.SetRow(island, index);
 					Grid.SetColumn(island, 0);
 					island.SetOwner(this);
-					IslandsGrid.Children.Add(island);
+                    IslandsGrid.Children.Add(island);
 				}
 			}
 			else
@@ -175,7 +187,7 @@ namespace U5BFA.Libraries
 					Grid.SetRow(island, 0);
 					Grid.SetColumn(island, index);
 					island.SetOwner(this);
-					IslandsGrid.Children.Add(island);
+                    IslandsGrid.Children.Add(island);
 				}
 			}
 		}

@@ -31,6 +31,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
+	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\GeneralHelpers.cs" Link="GeneralHelpers.cs" />
 	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\ManualDefinitions.cs" Link="Helpers\ManualDefinitions.cs" />
 	  <Compile Include="..\TrayIconFlyout.Shared\Helpers\MouseEventReceivedEventArgs.cs" Link="Helpers\MouseEventReceivedEventArgs.cs" />
 	  <Compile Include="..\TrayIconFlyout.Shared\SystemTrayIcon.cs" Link="SystemTrayIcon.cs" />
