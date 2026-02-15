@@ -6,7 +6,6 @@
     xmlns:local="clr-namespace:U5BFA.Libraries;assembly=TrayIconFlyout.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Width="360"
-    Height="612"
     mc:Ignorable="d">
 
     <local:TrayIconFlyoutIsland Height="300">

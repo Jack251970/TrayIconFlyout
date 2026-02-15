@@ -3,7 +3,7 @@
 ### TrayIconFlyout
 
 ```xml
-<me:TrayIconFlyout x:Class="..." ... Width="360" Height="612">
+<me:TrayIconFlyout x:Class="..." ... Width="360">
 
     <me:TrayIconFlyoutIsland Height="300">
         <!-- Put elements here -->
