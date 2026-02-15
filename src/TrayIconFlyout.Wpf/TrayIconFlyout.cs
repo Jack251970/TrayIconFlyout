@@ -19,10 +19,11 @@ namespace U5BFA.Libraries
 		private const string PART_RootGrid = "PART_RootGrid";
 		private const string PART_IslandsGrid = "PART_IslandsGrid";
 
-		private Window? _host;
-		private bool _isPopupAnimationPlaying;
 		private Grid? RootGrid;
 		private Grid? IslandsGrid;
+
+        private Window? _host;
+		private bool _isPopupAnimationPlaying;
 
 		public bool IsOpen { get; private set; }
 
