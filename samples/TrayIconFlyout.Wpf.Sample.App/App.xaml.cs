@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Jack251970. All rights reserved.
 // Licensed under the MIT license.
 
+using iNKORE.UI.WPF.Modern.Common;
 using System;
 using System.Windows;
 
@@ -12,7 +13,7 @@ namespace U5BFA.Libraries
 
         public App()
         {
-            AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
+            ShadowAssist.UseBitmapCache = false;
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -24,9 +25,29 @@ namespace U5BFA.Libraries
 
             _window = new MainWindow();
             _window.Show();
+
+            RegisterExitEvents();
         }
 
-        private void AppDomain_ProcessExit(object? sender, EventArgs e)
+        private void RegisterExitEvents()
+        {
+            AppDomain.CurrentDomain.ProcessExit += (s, e) =>
+            {
+                Dispose();
+            };
+
+            Current.Exit += (s, e) =>
+            {
+                Dispose();
+            };
+
+            Current.SessionEnding += (s, e) =>
+            {
+                Dispose();
+            };
+        }
+
+        private void Dispose()
         {
             TrayIconManager.Default.Dispose();
         }
