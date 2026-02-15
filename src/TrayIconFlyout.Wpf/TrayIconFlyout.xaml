@@ -13,11 +13,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:TrayIconFlyout}">
-                    <Grid x:Name="PART_RootGrid" RenderTransformOrigin="0.5,0.5">
-                        <Grid.RenderTransform>
-                            <TranslateTransform X="0" Y="0" />
-                        </Grid.RenderTransform>
-
+                    <Grid x:Name="PART_RootGrid" Visibility="Hidden">
                         <Grid x:Name="PART_IslandsGrid" />
                     </Grid>
                 </ControlTemplate>

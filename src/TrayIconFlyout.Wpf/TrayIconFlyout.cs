@@ -78,26 +78,15 @@ namespace U5BFA.Libraries
 
             UpdateFlyoutRegion();
 
-            // Ensure to hide first
-            /*if (RootGrid.RenderTransform is TranslateTransform translateTransform)
-			{
-				if (PopupDirection is Orientation.Vertical)
-					translateTransform.Y = DesiredSize.Height;
-				else
-					translateTransform.X = DesiredSize.Width;
-			}*/
-
             UpdateLayout();
 
             _host.Show();
 
-			if (IsTransitionAnimationEnabled)
+			RootGrid.Visibility = Visibility.Visible;
+
+            if (IsTransitionAnimationEnabled)
 			{
-				var storyboard = PopupDirection is Orientation.Vertical
-					? GetBottomToTopTransitionStoryboard(RootGrid, (int)DesiredSize.Height, 0)
-					: GetRightToLeftTransitionStoryboard(RootGrid, (int)DesiredSize.Width, 0);
-				storyboard.Completed += OpenAnimationStoryboard_Completed;
-				storyboard.Begin();
+				// TODO
 			}
 			else
 			{
@@ -113,13 +102,11 @@ namespace U5BFA.Libraries
 
 			_isPopupAnimationPlaying = true;
 
-			if (IsTransitionAnimationEnabled)
+			RootGrid.Visibility = Visibility.Visible;
+
+            if (IsTransitionAnimationEnabled)
 			{
-				var storyboard = PopupDirection is Orientation.Vertical
-					? GetTopToBottomTransitionStoryboard(RootGrid, 0, (int)DesiredSize.Height)
-					: GetLeftToRightTransitionStoryboard(RootGrid, 0, (int)DesiredSize.Width);
-				storyboard.Completed += CloseAnimationStoryboard_Completed;
-				storyboard.Begin();
+				// TODO
 			}
 			else
 			{
@@ -196,52 +183,6 @@ namespace U5BFA.Libraries
 						IslandsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(12) });
                 }
             }
-		}
-
-		private Storyboard GetBottomToTopTransitionStoryboard(FrameworkElement target, int from, int to)
-		{
-			var animation = new DoubleAnimation
-			{
-				From = from,
-				To = to,
-				Duration = TimeSpan.FromMilliseconds(250),
-				EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-			};
-
-			Storyboard.SetTarget(animation, target);
-			Storyboard.SetTargetProperty(animation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-
-			var storyboard = new Storyboard();
-			storyboard.Children.Add(animation);
-			return storyboard;
-		}
-
-		private Storyboard GetTopToBottomTransitionStoryboard(FrameworkElement target, int from, int to)
-		{
-			return GetBottomToTopTransitionStoryboard(target, from, to);
-		}
-
-		private Storyboard GetRightToLeftTransitionStoryboard(FrameworkElement target, int from, int to)
-		{
-			var animation = new DoubleAnimation
-			{
-				From = from,
-				To = to,
-				Duration = TimeSpan.FromMilliseconds(250),
-				EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-			};
-
-			Storyboard.SetTarget(animation, target);
-			Storyboard.SetTargetProperty(animation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-
-			var storyboard = new Storyboard();
-			storyboard.Children.Add(animation);
-			return storyboard;
-		}
-
-		private Storyboard GetLeftToRightTransitionStoryboard(FrameworkElement target, int from, int to)
-		{
-			return GetRightToLeftTransitionStoryboard(target, from, to);
 		}
 
 		private void OpenAnimationStoryboard_Completed(object? sender, EventArgs e)
