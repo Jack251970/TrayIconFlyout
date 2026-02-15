@@ -13,7 +13,6 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
 		<NoWarn>$(NoWarn);CS8305</NoWarn>
-		<DefineConstants>$(DefineConstants)</DefineConstants>
 
 		<UseWPF>true</UseWPF>
 
