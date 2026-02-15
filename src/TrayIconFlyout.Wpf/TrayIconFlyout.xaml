@@ -44,12 +44,6 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{TemplateBinding CornerRadius}">
-                            <Border.Effect>
-                                <DropShadowEffect
-                                    BlurRadius="15"
-                                    Opacity="0.3"
-                                    ShadowDepth="5" />
-                            </Border.Effect>
 
                             <ContentPresenter
                                 x:Name="PART_MainContentPresenter"
