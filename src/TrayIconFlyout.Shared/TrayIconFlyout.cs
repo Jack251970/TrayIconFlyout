@@ -38,7 +38,6 @@ namespace U5BFA.Libraries
 
 		private readonly XamlIslandHostWindow? _host;
 		private bool? _wasTaskbarLightLastTimeChecked;
-		private bool? _wasTaskbarColorPrevalenceLastTimeChecked;
 		private bool _isPopupAnimationPlaying;
 
 		private Grid? RootGrid;
@@ -156,24 +155,40 @@ namespace U5BFA.Libraries
 		{
 			var isTaskbarLight = GeneralHelpers.IsTaskbarLight();
 			var isTaskbarColorPrevalence = GeneralHelpers.IsTaskbarColorPrevalenceEnabled();
-			bool shouldUpdateBackdrop = _wasTaskbarLightLastTimeChecked != isTaskbarLight || _wasTaskbarColorPrevalenceLastTimeChecked != isTaskbarColorPrevalence;
-			_wasTaskbarLightLastTimeChecked = isTaskbarLight;
-			_wasTaskbarColorPrevalenceLastTimeChecked = isTaskbarColorPrevalence;
-			if (!shouldUpdateBackdrop && !coerce)
-				return;
 
-			ISystemBackdropControllerWithTargets? controller = BackdropKind is BackdropKind.Acrylic
-				? (isTaskbarColorPrevalence
+			ISystemBackdropControllerWithTargets? controller = null;
+			if (coerce)
+			{
+                controller = BackdropKind is BackdropKind.Acrylic
+					? (isTaskbarColorPrevalence
+						? BackdropControllerHelpers.GetAccentedAcrylicController(Resources)
+						: isTaskbarLight
+							? BackdropControllerHelpers.GetLightAcrylicController(Resources)
+							: BackdropControllerHelpers.GetDarkAcrylicController(Resources))
+					: (isTaskbarColorPrevalence
+						? BackdropControllerHelpers.GetAccentedMicaController(Resources)
+						: isTaskbarLight
+							? BackdropControllerHelpers.GetLightMicaController(Resources)
+							: BackdropControllerHelpers.GetDarkMicaController(Resources));
+            }
+            else if (isTaskbarColorPrevalence)  // Force update backdrop when color prevalence is on, as the accent color might change
+            {
+				controller = BackdropKind is BackdropKind.Acrylic
 					? BackdropControllerHelpers.GetAccentedAcrylicController(Resources)
-					: isTaskbarLight
+					: BackdropControllerHelpers.GetAccentedMicaController(Resources);
+            }
+			else if (_wasTaskbarLightLastTimeChecked != isTaskbarLight)
+			{
+				controller = BackdropKind is BackdropKind.Acrylic
+					? (isTaskbarLight
 						? BackdropControllerHelpers.GetLightAcrylicController(Resources)
 						: BackdropControllerHelpers.GetDarkAcrylicController(Resources))
-				: (isTaskbarColorPrevalence
-					? BackdropControllerHelpers.GetAccentedMicaController(Resources)
-					: isTaskbarLight
+					: (isTaskbarLight
 						? BackdropControllerHelpers.GetLightMicaController(Resources)
 						: BackdropControllerHelpers.GetDarkMicaController(Resources));
-			if (controller is null)
+                _wasTaskbarLightLastTimeChecked = isTaskbarLight;
+            }
+            if (controller is null)
 				return;
 
 			BackdropManager?.Dispose();
