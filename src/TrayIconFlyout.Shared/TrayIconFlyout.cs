@@ -1,4 +1,4 @@
-﻿// Copyright (c) 0x5BFA. All rights reserved.
+// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
 using System;
@@ -42,10 +42,10 @@ namespace U5BFA.Libraries
 		private bool? _wasTaskbarLightLastTimeChecked;
 		private bool? _wasTaskbarColorPrevalenceLastTimeChecked;
 		private bool _isPopupAnimationPlaying;
-        private TrayIconFlyoutPopupDirection _lastFlyoutPopupDirection;
-        private FlyoutPlacementMode _lastFlyoutPlacementMode;
+		private TrayIconFlyoutPopupDirection _lastFlyoutPopupDirection;
+		private FlyoutPlacementMode _lastFlyoutPlacementMode;
 
-        private Grid? RootGrid;
+		private Grid? RootGrid;
 		private Grid? IslandsGrid;
 
 #if WASDK
@@ -88,11 +88,11 @@ namespace U5BFA.Libraries
 			_isPopupAnimationPlaying = true;
 			_host.Maximize();
 
-            // Cache the current animation and placement modes to ensure consistency during the animation
-            _lastFlyoutPopupDirection = PopupDirection;
-            _lastFlyoutPlacementMode = Placement;
+			// Cache the current animation and placement modes to ensure consistency during the animation
+			_lastFlyoutPopupDirection = PopupDirection;
+			_lastFlyoutPlacementMode = Placement;
 
-            _ = Task.Run(async () =>
+			_ = Task.Run(async () =>
 			{
 #if UWP
 				await RootGrid.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal, async () =>
@@ -109,37 +109,37 @@ namespace U5BFA.Libraries
 #endif
 					UpdateFlyoutRegion();
 
-                    // Ensure the render transform is a mutable TranslateTransform for animation
-                    if (RootGrid.RenderTransform is not TranslateTransform translateTransform)
-                    {
-                        RootGrid.RenderTransform = new TranslateTransform();
-                    }
-                    translateTransform = (TranslateTransform)RootGrid.RenderTransform;
+					// Ensure the render transform is a mutable TranslateTransform for animation
+					if (RootGrid.RenderTransform is not TranslateTransform translateTransform)
+					{
+						RootGrid.RenderTransform = new TranslateTransform();
+					}
+					translateTransform = (TranslateTransform)RootGrid.RenderTransform;
 					
 					var transformOrientation = Orientation.Vertical;
-                    var transformSize = 0d;
-                    if (IsTransitionAnimationEnabled)
-                    {
-                        // Ensure to hide first and update the transform
-                        (transformOrientation, transformSize) = GetTranslateTransformInfo();
-                        if (transformOrientation is Orientation.Vertical)
-                        {
-                            translateTransform.X = 0;
-                            translateTransform.Y = transformSize;
-                        }
-                        else
-                        {
-                            translateTransform.X = transformSize;
-                            translateTransform.Y = 0;
-                        }
-                    }
-                    else
-                    {
-                        // Ensure the transform is reset to show the popup without animation
-                        translateTransform.X = translateTransform.Y = 0;
-                    }
+					var transformSize = 0d;
+					if (IsTransitionAnimationEnabled)
+					{
+						// Ensure to hide first and update the transform
+						(transformOrientation, transformSize) = GetTranslateTransformInfo();
+						if (transformOrientation is Orientation.Vertical)
+						{
+							translateTransform.X = 0;
+							translateTransform.Y = transformSize;
+						}
+						else
+						{
+							translateTransform.X = transformSize;
+							translateTransform.Y = 0;
+						}
+					}
+					else
+					{
+						// Ensure the transform is reset to show the popup without animation
+						translateTransform.X = translateTransform.Y = 0;
+					}
 
-                    UpdateLayout();
+					UpdateLayout();
 					await Task.Delay(1);
 
 					_host.UpdateWindowVisibility(true);
@@ -147,10 +147,10 @@ namespace U5BFA.Libraries
 					if (IsTransitionAnimationEnabled)
 					{
 						var storyboard = transformOrientation is Orientation.Vertical
-                            ? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, (int)transformSize, 0)
+							? TransitionHelpers.GetWindows11BottomToTopTransitionStoryboard(RootGrid, (int)transformSize, 0)
 							: TransitionHelpers.GetWindows11RightToLeftTransitionStoryboard(RootGrid, (int)transformSize, 0);
-                        storyboard.Completed += OpenAnimationStoryboard_Completed;
-                        storyboard.Begin();
+						storyboard.Completed += OpenAnimationStoryboard_Completed;
+						storyboard.Begin();
 					}
 				});
 			});
@@ -165,26 +165,26 @@ namespace U5BFA.Libraries
 
 			if (IsTransitionAnimationEnabled)
 			{
-                var transformInfo = GetTranslateTransformInfo();
-                var storyboard = transformInfo.Orientation is Orientation.Vertical
-                    ? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, (int)transformInfo.Size)
+				var transformInfo = GetTranslateTransformInfo();
+				var storyboard = transformInfo.Orientation is Orientation.Vertical
+					? TransitionHelpers.GetWindows11TopToBottomTransitionStoryboard(RootGrid, 0, (int)transformInfo.Size)
 					: TransitionHelpers.GetWindows11LeftToRightTransitionStoryboard(RootGrid, 0, (int)transformInfo.Size);
-                storyboard.Completed += CloseAnimationStoryboard_Completed;
-                storyboard.Begin();
+				storyboard.Completed += CloseAnimationStoryboard_Completed;
+				storyboard.Begin();
 			}
 		}
 
-        private (Orientation Orientation, double Size) GetTranslateTransformInfo()
-        {
-            return _lastFlyoutPopupDirection switch
-            {
-                TrayIconFlyoutPopupDirection.Up => (Orientation.Vertical, DesiredSize.Height),
-                TrayIconFlyoutPopupDirection.Down => (Orientation.Vertical, -DesiredSize.Height),
-                TrayIconFlyoutPopupDirection.Right => (Orientation.Horizontal, -DesiredSize.Width),
-                TrayIconFlyoutPopupDirection.Left => (Orientation.Horizontal, DesiredSize.Width),
-                _ => ((Orientation Orientation, double Size))(Orientation.Vertical, 0),
-            };
-        }
+		private (Orientation Orientation, double Size) GetTranslateTransformInfo()
+		{
+			return _lastFlyoutPopupDirection switch
+			{
+				TrayIconFlyoutPopupDirection.Up => (Orientation.Vertical, DesiredSize.Height),
+				TrayIconFlyoutPopupDirection.Down => (Orientation.Vertical, -DesiredSize.Height),
+				TrayIconFlyoutPopupDirection.Right => (Orientation.Horizontal, -DesiredSize.Width),
+				TrayIconFlyoutPopupDirection.Left => (Orientation.Horizontal, DesiredSize.Width),
+				_ => ((Orientation Orientation, double Size))(Orientation.Vertical, 0),
+			};
+		}
 
 #if UWP
 		public unsafe bool TryPreTranslateMessage(MSG* msg)
@@ -194,7 +194,7 @@ namespace U5BFA.Libraries
 #endif
 
 #if WASDK
-        private void UpdateBackdropManager(bool coerce = false)
+		private void UpdateBackdropManager(bool coerce = false)
 		{
 			var isTaskbarLight = GeneralHelpers.IsTaskbarLight();
 			var isTaskbarColorPrevalence = GeneralHelpers.IsTaskbarColorPrevalenceEnabled();
