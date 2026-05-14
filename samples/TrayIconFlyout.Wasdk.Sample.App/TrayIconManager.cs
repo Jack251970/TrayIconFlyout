@@ -55,6 +55,7 @@ namespace U5BFA.Libraries
 			SystemTrayIcon?.RightClicked -= SystemTrayIcon_RightClicked;
 			SystemTrayIcon?.Destroy();
 			TrayIconFlyout?.Dispose();
+			TrayIconMenuFlyout?.Dispose();
 		}
 	}
 }
