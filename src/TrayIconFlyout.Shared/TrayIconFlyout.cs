@@ -104,6 +104,11 @@ namespace U5BFA.Libraries
 				RootGrid.DispatcherQueue.TryEnqueue(async () =>
 #endif
 				{
+					ResetResolvedFlyoutSize();
+					UpdateLayout();
+					await Task.Delay(1);
+					ApplyResolvedFlyoutSize();
+
 					UpdateLayout();
 					await Task.Delay(1);
 
@@ -244,7 +249,7 @@ namespace U5BFA.Libraries
 					if (Islands[index] is not TrayIconFlyoutIsland island)
 						continue;
 
-					IslandsGrid.RowDefinitions.Add(new() { Height = GridLength.Auto });
+					IslandsGrid.RowDefinitions.Add(new() { Height = island.IslandHeight });
 					Grid.SetRow(island, index);
 					Grid.SetColumn(island, 0);
 					island.SetOwner(this);
@@ -259,7 +264,7 @@ namespace U5BFA.Libraries
 					if (Islands[index] is not TrayIconFlyoutIsland island)
 						continue;
 
-					IslandsGrid.ColumnDefinitions.Add(new() { Width = GridLength.Auto });
+					IslandsGrid.ColumnDefinitions.Add(new() { Width = island.IslandWidth });
 					Grid.SetRow(island, 0);
 					Grid.SetColumn(island, index);
 					island.SetOwner(this);
@@ -273,12 +278,16 @@ namespace U5BFA.Libraries
 			if (_host?.DesktopWindowXamlSource is null || IslandsGrid is null)
 				return ResolvePopupDirection(PopupDirection, default, 0, 0);
 
-			var flyoutWidth = DesiredSize.Width * _host.XamlIslandRasterizationScale;
-			var flyoutHeight = DesiredSize.Height * _host.XamlIslandRasterizationScale;
+			var scale = _host.XamlIslandRasterizationScale;
+			var flyoutWidth = GetCurrentFlyoutWidth();
+			var flyoutHeight = GetCurrentFlyoutHeight();
+			var scaledMargin = GetScaledMargin(Margin, scale);
+			var frameWidth = (flyoutWidth + Margin.Left + Margin.Right) * scale;
+			var frameHeight = (flyoutHeight + Margin.Top + Margin.Bottom) * scale;
 			var hostWidth = _host.WindowSize.Width;
 			var hostHeight = _host.WindowSize.Height;
-			var regionWidth = Math.Max(1, (int)Math.Ceiling(Math.Min(flyoutWidth, hostWidth)));
-			var regionHeight = Math.Max(1, (int)Math.Ceiling(Math.Min(flyoutHeight, hostHeight)));
+			var regionWidth = Math.Max(1, (int)Math.Ceiling(Math.Min(frameWidth, hostWidth)));
+			var regionHeight = Math.Max(1, (int)Math.Ceiling(Math.Min(frameHeight, hostHeight)));
 			var customBottomCenterPoint = _customPlacementBottomCenterPoint;
 			var requestedPopupDirection = _customPopupDirection ?? PopupDirection;
 			_customPlacementBottomCenterPoint = null;
@@ -289,8 +298,8 @@ namespace U5BFA.Libraries
 
 			if (customBottomCenterPoint is Point bottomCenterPoint)
 			{
-				left = bottomCenterPoint.X - (regionWidth / 2);
-				top = bottomCenterPoint.Y - regionHeight;
+				left = bottomCenterPoint.X - ((flyoutWidth * scale) / 2) - scaledMargin.Left;
+				top = bottomCenterPoint.Y - (flyoutHeight * scale) - scaledMargin.Top;
 			}
 			else
 			{
@@ -310,6 +319,84 @@ namespace U5BFA.Libraries
 			_host.SetHWndRectRegion(new(0, 0, region.Width, region.Height));
 
 			return ResolvePopupDirection(requestedPopupDirection, region, hostWidth, hostHeight);
+		}
+
+		private void OnFlyoutSizeChanged()
+		{
+			UpdateOpenFlyoutLayout();
+		}
+
+		internal void OnIslandSizeChanged()
+		{
+			UpdateIslands();
+			UpdateOpenFlyoutLayout();
+		}
+
+		private void UpdateOpenFlyoutLayout()
+		{
+			if (!IsOpen || _isPopupAnimationPlaying || RootGrid is null || _host?.DesktopWindowXamlSource is null)
+				return;
+
+			ResetResolvedFlyoutSize();
+			UpdateLayout();
+			ApplyResolvedFlyoutSize();
+			UpdateLayout();
+			_activePopupDirection = UpdateFlyoutRegion();
+			SetOpenTransform();
+		}
+
+		private void ResetResolvedFlyoutSize()
+		{
+			if (RootGrid is null)
+				return;
+
+			RootGrid.Width = double.NaN;
+			RootGrid.Height = double.NaN;
+		}
+
+		private void ApplyResolvedFlyoutSize()
+		{
+			if (RootGrid is null || _host is null)
+				return;
+
+			var (availableWidth, availableHeight) = GetAvailableFlyoutSizeInDips();
+			RootGrid.Width = ResolveFlyoutLength(FlyoutWidth, availableWidth, HasStarIslandWidth());
+			RootGrid.Height = ResolveFlyoutLength(FlyoutHeight, availableHeight, HasStarIslandHeight());
+		}
+
+		private (double Width, double Height) GetAvailableFlyoutSizeInDips()
+		{
+			if (_host is null)
+				return (0, 0);
+
+			var scale = _host.XamlIslandRasterizationScale;
+			var hostSize = _host.WindowSize;
+			var availableWidth = (hostSize.Width / scale) - Margin.Left - Margin.Right;
+			var availableHeight = (hostSize.Height / scale) - Margin.Top - Margin.Bottom;
+
+			return (Math.Max(0, availableWidth), Math.Max(0, availableHeight));
+		}
+
+		private bool HasStarIslandWidth()
+		{
+			foreach (var item in Islands)
+			{
+				if (item is TrayIconFlyoutIsland island && island.IslandWidth.IsStar)
+					return true;
+			}
+
+			return false;
+		}
+
+		private bool HasStarIslandHeight()
+		{
+			foreach (var item in Islands)
+			{
+				if (item is TrayIconFlyoutIsland island && island.IslandHeight.IsStar)
+					return true;
+			}
+
+			return false;
 		}
 
 #if WASDK
@@ -402,8 +489,8 @@ namespace U5BFA.Libraries
 		{
 			return popupDirection switch
 			{
-				TrayIconFlyoutPopupDirection.LeftToRight => -(int)DesiredSize.Width,
-				TrayIconFlyoutPopupDirection.RightToLeft => (int)DesiredSize.Width,
+				TrayIconFlyoutPopupDirection.LeftToRight => -(int)Math.Ceiling(GetCurrentFlyoutWidth() + Margin.Left),
+				TrayIconFlyoutPopupDirection.RightToLeft => (int)Math.Ceiling(GetCurrentFlyoutWidth() + Margin.Right),
 				_ => 0,
 			};
 		}
@@ -412,10 +499,40 @@ namespace U5BFA.Libraries
 		{
 			return popupDirection switch
 			{
-				TrayIconFlyoutPopupDirection.TopToBottom => -(int)DesiredSize.Height,
-				TrayIconFlyoutPopupDirection.BottomToTop => (int)DesiredSize.Height,
+				TrayIconFlyoutPopupDirection.TopToBottom => -(int)Math.Ceiling(GetCurrentFlyoutHeight() + Margin.Top),
+				TrayIconFlyoutPopupDirection.BottomToTop => (int)Math.Ceiling(GetCurrentFlyoutHeight() + Margin.Bottom),
 				_ => 0,
 			};
+		}
+
+		private double GetCurrentFlyoutWidth()
+		{
+			return RootGrid?.ActualWidth > 0 ? RootGrid.ActualWidth : DesiredSize.Width;
+		}
+
+		private double GetCurrentFlyoutHeight()
+		{
+			return RootGrid?.ActualHeight > 0 ? RootGrid.ActualHeight : DesiredSize.Height;
+		}
+
+		private static double ResolveFlyoutLength(GridLength length, double availableLength, bool stretchWhenAuto)
+		{
+			if (length.IsAuto)
+				return stretchWhenAuto ? availableLength : double.NaN;
+
+			if (length.IsStar)
+				return availableLength;
+
+			return Clamp(length.Value, 0, availableLength);
+		}
+
+		private static (double Left, double Top, double Right, double Bottom) GetScaledMargin(Thickness margin, double scale)
+		{
+			return (
+				margin.Left * scale,
+				margin.Top * scale,
+				margin.Right * scale,
+				margin.Bottom * scale);
 		}
 
 		private static (double Left, double Top) GetPlacementOrigin(FlyoutPlacementMode placement, double width, double height, double hostWidth, double hostHeight)

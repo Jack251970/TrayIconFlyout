@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,10 +30,17 @@ namespace U5BFA.Libraries
 		internal partial int SelectedFlyoutPlacementIndex { get; set; }
 
 		[ObservableProperty]
+		internal partial int SelectedFlyoutWidthIndex { get; set; }
+
+		[ObservableProperty]
+		internal partial int SelectedFlyoutHeightIndex { get; set; }
+
+		[ObservableProperty]
 		internal partial int SelectedBackdropIndex { get; set; }
 
 		public Dictionary<TrayIconFlyoutPopupDirection, string> PopupDirections { get; private set; } = [];
 		public Dictionary<FlyoutPlacementMode, string> FlyoutPlacements { get; private set; } = [];
+		public Dictionary<GridLength, string> FlyoutSizes { get; private set; } = [];
 		public Dictionary<BackdropKind, string> Backdrops { get; private set; } = [];
 
 		internal RootViewModel()
@@ -56,6 +64,12 @@ namespace U5BFA.Libraries
 			FlyoutPlacements.Add(FlyoutPlacementMode.BottomEdgeAlignedLeft, "Bottom left");
 			FlyoutPlacements.Add(FlyoutPlacementMode.BottomEdgeAlignedRight, "Bottom right");
 			SelectedFlyoutPlacementIndex = 3;
+
+			FlyoutSizes.Add(GridLength.Auto, "Auto");
+			FlyoutSizes.Add(new GridLength(360), "360");
+			FlyoutSizes.Add(new GridLength(1, GridUnitType.Star), "*");
+			SelectedFlyoutWidthIndex = 1;
+			SelectedFlyoutHeightIndex = 0;
 
 			Backdrops.Add(BackdropKind.Acrylic, "Acrylic");
 			Backdrops.Add(BackdropKind.Mica, "Mica");
@@ -90,6 +104,16 @@ namespace U5BFA.Libraries
 		partial void OnSelectedFlyoutPlacementIndexChanged(int value)
 		{
 			TrayIconManager.Default.TrayIconFlyout?.Placement = FlyoutPlacements.ElementAt(value).Key;
+		}
+
+		partial void OnSelectedFlyoutWidthIndexChanged(int value)
+		{
+			TrayIconManager.Default.TrayIconFlyout?.FlyoutWidth = FlyoutSizes.ElementAt(value).Key;
+		}
+
+		partial void OnSelectedFlyoutHeightIndexChanged(int value)
+		{
+			TrayIconManager.Default.TrayIconFlyout?.FlyoutHeight = FlyoutSizes.ElementAt(value).Key;
 		}
 
 		partial void OnSelectedBackdropIndexChanged(int value)
