@@ -399,8 +399,10 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-
-            <Grid Padding="32" RowSpacing="12">
+            <Grid
+                Padding="32"
+                Background="{ThemeResource FlyoutOverlayBackgroundBrush}"
+                RowSpacing="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
